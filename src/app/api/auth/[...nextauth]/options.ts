@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials: any): Promise<any> {
-                if (!credentials?.identifier || !credentials?.password) {
+                if (!credentials?.username || !credentials?.password) {
                     console.error("Invalid credentials provided:", credentials);
                     throw new Error("Both email/username and password are required.");
                 }
@@ -25,11 +25,11 @@ export const authOptions: NextAuthOptions = {
             
                 try {
                     const user = await UserModel.findOne({
-                        $or: [{ email: credentials.identifier }, { username: credentials.identifier }],
+                        $or: [{ email: credentials.username }, { username: credentials.username }],
                     });
             
                     if (!user) {
-                        console.log("No user found for identifier:", credentials.identifier);
+                        console.log("No user found for identifier:", credentials.username);
                         throw new Error("No User Found with this email/username");
                     }
             
@@ -39,6 +39,7 @@ export const authOptions: NextAuthOptions = {
                     }
             
                     const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
+                    console.log("Password comparison result:", isPasswordCorrect);
                     if (!isPasswordCorrect) {
                         console.log("Incorrect password for user:", user.username);
                         throw new Error("Incorrect Password");
@@ -46,15 +47,11 @@ export const authOptions: NextAuthOptions = {
             
                     return user;
                 } catch (error) {
-                    if (error instanceof Error) {
-                        console.error("Authorization error:", error.message);
-                        throw new Error(error.message);
-                    } else {
-                        console.error("Unknown error occurred:", error);
-                        throw new Error("Authorization failed due to an unknown error.");
-                    }
+                    console.error("Authorization error:", error);
+                    throw new Error("Authorization failed.");
                 }
             }
+            
             
             
         })
