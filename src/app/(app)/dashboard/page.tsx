@@ -9,9 +9,9 @@ import { Message } from '@/model/User';
 import { ApiResponse } from '../../../../types/ApiResponse';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
-import { Loader2, RefreshCcw } from 'lucide-react';
+import { Loader2, RefreshCcw, LogOut } from 'lucide-react'; // Import LogOut icon
 import { User } from 'next-auth';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react'; // Import signOut from next-auth
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AcceptMessageSchema } from '@/schemas/acceptMessageSchema';
@@ -133,6 +133,10 @@ function UserDashboard() {
     });
   };
 
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' }); // Log the user out and redirect to home page
+  };
+
   return (
     <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-white rounded w-full max-w-6xl">
       <h1 className="text-4xl font-bold mb-4">User Dashboard</h1>
@@ -177,11 +181,11 @@ function UserDashboard() {
           <RefreshCcw className="h-4 w-4" />
         )}
       </Button>
+
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
         {messages.length > 0 ? (
           messages.map((message, index) => (
             <MessageCard
-              // key={message._id} //will uncomment after running the api
               key={index}
               message={message}
               onMessageDelete={handleDeleteMessage}
@@ -190,6 +194,12 @@ function UserDashboard() {
         ) : (
           <p>No messages to display.</p>
         )}
+      </div>
+
+      <div className="mt-8">
+        <Button variant="destructive" onClick={handleLogout}>
+          <LogOut className="h-4 w-4 mr-2" /> Logout
+        </Button>
       </div>
     </div>
   );

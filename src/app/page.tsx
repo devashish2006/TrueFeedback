@@ -4,6 +4,7 @@ import { Mail } from 'lucide-react'; // Assuming you have an icon for messages
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Autoplay from 'embla-carousel-autoplay';
 import messages from '@/messages.json';
+import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 
 import {
   Carousel,
@@ -14,6 +15,16 @@ import {
 } from "@/components/ui/carousel";
 
 export default function Home() {
+  const router = useRouter(); // Initialize the useRouter hook for navigation
+
+  const handleSignInClick = () => {
+    router.push('/sign-in'); // Redirect to the sign-in page
+  };
+
+  const handleSignUpClick = () => {
+    router.push('/sign-up'); // Redirect to the sign-up page
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-800 text-white">
       {/* Main content */}
@@ -26,6 +37,22 @@ export default function Home() {
             True Feedback - Where your identity remains a secret.
           </p>
         </section>
+
+        {/* Sign In / Sign Up Buttons */}
+        <div className="flex space-x-4 mb-8">
+          <button
+            className="px-6 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-500 text-white font-semibold transition-all"
+            onClick={handleSignInClick}
+          >
+            Sign In
+          </button>
+          <button
+            className="px-6 py-3 bg-teal-600 rounded-lg hover:bg-teal-500 text-white font-semibold transition-all"
+            onClick={handleSignUpClick}
+          >
+            Sign Up
+          </button>
+        </div>
 
         {/* Carousel for Messages */}
         <div className="relative w-full max-w-lg md:max-w-xl flex-grow">
@@ -67,7 +94,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="text-center p-4 md:p-6 bg-gray-900 text-white">
-        © 2023 True Feedback. All rights reserved.
+        © 2025 True Feedback. All rights reserved.
       </footer>
     </div>
   );

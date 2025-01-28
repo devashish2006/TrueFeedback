@@ -17,15 +17,15 @@ export async function middleware(request: NextRequest) {
     token &&
     (url.pathname.startsWith('/sign-in') ||
       url.pathname.startsWith('/sign-up') ||
-      url.pathname.startsWith('/verify') ||
-      url.pathname === '/')
+      url.pathname.startsWith('/verify') 
+    )
   ) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // if (!token && url.pathname.startsWith('/dashboard')) {
-  //   return NextResponse.redirect(new URL('/sign-in', request.url));
-  // }
+  if (!token && url.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/sign-in', request.url));
+  }
 
   return NextResponse.next();
 }
