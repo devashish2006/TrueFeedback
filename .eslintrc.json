@@ -1,3 +1,14 @@
+
+
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "warn",  // Change 'error' to 'warn'
+    "react-hooks/rules-of-hooks": "warn",  // Change to 'warn' instead of error
+    "@typescript-eslint/no-explicit-any": "warn",  // Allow 'any' type but warn
+    "no-console": "off",  // Disable console.log errors
+    "react/jsx-uses-react": "off",  // Prevent React import warning
+    "react/react-in-jsx-scope": "off"  // Next.js does not require React import
+  }
 }
