@@ -28,6 +28,7 @@
     "embla-carousel": "^8.5.2",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
+    "framer-motion": "^12.4.9",
     "google-auth-library": "^9.15.1",
     "lucide-react": "^0.460.0",
     "mongoose": "^8.7.1",
