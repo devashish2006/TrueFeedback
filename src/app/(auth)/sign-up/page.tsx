@@ -24,7 +24,7 @@ import axios, { AxiosError } from 'axios';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
-export default function signUpForm() {
+export default function SignUpForm() {
     const [username, setUsername] = useState('');
     const [usernameMessage, setUsernameMessage] = useState('');
     const [isCheckingUsername, setIsCheckingUsername] = useState(false);
@@ -45,19 +45,15 @@ export default function signUpForm() {
 
     useEffect(() => {
         const checkUsernameUnique = async () => {
-            if (debouncedUsername.trim()) { // Ensure it's not empty or just spaces
+            if (debouncedUsername.trim()) {
                 setIsCheckingUsername(true);
                 setUsernameMessage('');
                 try {
-                    const response = await axios.get<ApiResponse>(
-                        `/api/check-username-unique?username=${debouncedUsername}`
-                    );
+                    const response = await axios.get<ApiResponse>(`/api/check-username-unique?username=${debouncedUsername}`);
                     setUsernameMessage(response.data.message);
                 } catch (error) {
                     const axiosError = error as AxiosError<ApiResponse>;
-                    setUsernameMessage(
-                        axiosError.response?.data.message ?? 'Error checking username'
-                    );
+                    setUsernameMessage(axiosError.response?.data.message ?? 'Error checking username');
                 } finally {
                     setIsCheckingUsername(false);
                 }
@@ -65,6 +61,7 @@ export default function signUpForm() {
                 setUsernameMessage('');
             }
         };
+
         checkUsernameUnique();
     }, [debouncedUsername]);
 
@@ -72,21 +69,20 @@ export default function signUpForm() {
         setIsSubmitting(true);
         try {
             const response = await axios.post<ApiResponse>(`/api/sign-up`, data);
-
             toast({
                 title: 'Success',
                 description: response.data.message,
             });
 
-            setIsSubmitting(false);
-            router.push('/dashboard'); // Navigate to a new page on success
+            router.push(`/verify/${data.username}`);
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
             toast({
-                title: 'SignUp failed',
+                title: 'Sign Up Failed',
                 description: axiosError.response?.data.message,
                 variant: 'destructive',
             });
+        } finally {
             setIsSubmitting(false);
         }
     };
@@ -116,17 +112,10 @@ export default function signUpForm() {
                                         }}
                                     />
                                     {!isCheckingUsername && usernameMessage && (
-                                        <p
-                                            className={`text-sm ${
-                                                usernameMessage === 'Username is unique'
-                                                    ? 'text-green-500'  // Green for unique username
-                                                    : 'text-red-500'    // Red for taken username or error
-                                            }`}
-                                        >
+                                        <p className={`text-sm ${usernameMessage === 'Username is unique' ? 'text-green-500' : 'text-red-500'}`}>
                                             {usernameMessage}
                                         </p>
                                     )}
-
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -137,7 +126,7 @@ export default function signUpForm() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
-                                    <Input {...field} name="email" />
+                                    <Input {...field} />
                                     <p className="text-muted text-gray-400 text-sm">
                                         We will send you a verification code
                                     </p>
@@ -151,7 +140,7 @@ export default function signUpForm() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
-                                    <Input type="password" {...field} name="password" />
+                                    <Input type="password" {...field} />
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -174,7 +163,7 @@ export default function signUpForm() {
                         <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
                             Sign in
                         </Link>
-                    </p>    
+                    </p>
                 </div>
             </div>
         </div>

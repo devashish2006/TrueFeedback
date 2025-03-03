@@ -4,7 +4,7 @@ import { Mail } from 'lucide-react'; // Assuming you have an icon for messages
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Autoplay from 'embla-carousel-autoplay';
 import messages from '@/messages.json';
-import { useRouter } from 'next/navigation'; // Import useRouter for navigation
+import { useRouter } from 'next/navigation';
 
 import {
   Carousel,
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/carousel";
 
 export default function Home() {
-  const router = useRouter(); // Initialize the useRouter hook for navigation
+  const router = useRouter();
 
   const handleSignInClick = () => {
     router.push('/sign-in'); // Redirect to the sign-in page
@@ -41,13 +41,13 @@ export default function Home() {
         {/* Sign In / Sign Up Buttons */}
         <div className="flex space-x-4 mb-8">
           <button
-            className="px-6 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-500 text-white font-semibold transition-all"
+            className="px-6 py-3 border border-gray-400 text-gray-400 rounded-lg hover:bg-gray-700 hover:border-gray-700 transition-colors"
             onClick={handleSignInClick}
           >
             Sign In
           </button>
           <button
-            className="px-6 py-3 bg-teal-600 rounded-lg hover:bg-teal-500 text-white font-semibold transition-all"
+            className="px-6 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-500 text-white font-semibold transition-all"
             onClick={handleSignUpClick}
           >
             Sign Up
@@ -56,10 +56,7 @@ export default function Home() {
 
         {/* Carousel for Messages */}
         <div className="relative w-full max-w-lg md:max-w-xl flex-grow">
-          <Carousel
-            plugins={[Autoplay({ delay: 2000 })]}
-            className="w-full h-full"
-          >
+          <Carousel plugins={[Autoplay({ delay: 2000 })]} className="w-full h-full">
             <CarouselContent>
               {messages.map((message, index) => (
                 <CarouselItem key={index} className="p-4">
@@ -83,10 +80,10 @@ export default function Home() {
 
             {/* Navigation Buttons */}
             <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white rounded-full p-2 hover:bg-gray-600">
-              &#8592; {/* Left arrow */}
+              &#8592;
             </CarouselPrevious>
             <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white rounded-full p-2 hover:bg-gray-600">
-              &#8594; {/* Right arrow */}
+              &#8594;
             </CarouselNext>
           </Carousel>
         </div>
