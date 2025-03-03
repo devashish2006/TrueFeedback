@@ -1,6 +1,6 @@
 'use client';
 
-import { Mail } from 'lucide-react'; // Assuming you have an icon for messages
+import { Mail, Github, Linkedin, Instagram } from 'lucide-react'; // Added icons for GitHub, LinkedIn, and Instagram
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Autoplay from 'embla-carousel-autoplay';
 import messages from '@/messages.json';
@@ -91,7 +91,42 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="text-center p-4 md:p-6 bg-gray-900 text-white">
-        © 2025 True Feedback. All rights reserved.
+        <div className="mb-4">
+          <p className="text-lg font-semibold">Connect With ME :)</p>
+        </div>
+
+        {/* Social Media Links */}
+        <div className="flex justify-center space-x-6">
+          <a
+            href="https://github.com/devashish2006"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            <Github className="h-6 w-6" />
+          </a>
+          <a
+            href="https://www.linkedin.com/in/devashish-mishra-436891254"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            <Linkedin className="h-6 w-6" />
+          </a>
+          <a
+            href="https://instagram.com/devashish_6363"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            <Instagram className="h-6 w-6" />
+          </a>
+        </div>
+
+        {/* Copyright */}
+        <div className="mt-4 text-sm text-gray-400">
+          © 2025 True Feedback. All rights reserved.
+        </div>
       </footer>
     </div>
   );

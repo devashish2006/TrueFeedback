@@ -35,7 +35,7 @@ export async function POST(request: Request) {
             console.warn("Verification code expired for user:", decodedUsername);
             // Code has expired
             return Response.json(
-                {
+                {   
                     success: false,
                     message: "Verification code has expired. Please request a new code.",
                 },

@@ -11,7 +11,7 @@ export async function sendVerificationEmail(
   
   try {
     const response = await resend.emails.send({
-      from: 'truefeedback.xyz',
+      from: 'noreply@truefeedback.xyz',
       to: email,
       subject: 'TrueFeedback | Verification Code',
       react: VerificationEmail({ username, otp: verifyCode }),

@@ -31,6 +31,9 @@ function UserDashboard() {
 
   const form = useForm({
     resolver: zodResolver(AcceptMessageSchema),
+    defaultValues: {
+      acceptMessages: false, // Default value for the switch
+    },
   });
 
   const { register, watch, setValue } = form;
@@ -89,17 +92,17 @@ function UserDashboard() {
     if (!session || !session.user) return;
 
     fetchMessages();
-
     fetchAcceptMessages();
   }, [session, setValue, toast, fetchAcceptMessages, fetchMessages]);
 
   // Handle switch change
   const handleSwitchChange = async () => {
     try {
+      const newValue = !acceptMessages;
       const response = await axios.post<ApiResponse>('/api/accept-messages', {
-        acceptMessages: !acceptMessages,
+        acceptMessages: newValue,
       });
-      setValue('acceptMessages', !acceptMessages);
+      setValue('acceptMessages', newValue); // Update the form state
       toast({
         title: response.data.message,
         variant: 'default',

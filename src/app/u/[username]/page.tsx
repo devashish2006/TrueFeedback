@@ -24,7 +24,7 @@ import {
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useParams } from 'next/navigation';  // Import useParams from next/navigation
+import { useParams, useRouter } from 'next/navigation';
 
 const messageSchema = z.object({
   content: z.string().nonempty('Message cannot be empty'),
@@ -33,7 +33,8 @@ const messageSchema = z.object({
 type MessageSchema = z.infer<typeof messageSchema>;
 
 const SendMessage = () => {
-  const { username } = useParams();  // Get username from the URL
+  const { username } = useParams();
+  const router = useRouter();
 
   const form = useForm<MessageSchema>({
     resolver: zodResolver(messageSchema),
@@ -45,13 +46,16 @@ const SendMessage = () => {
   const [suggestions, setSuggestions] = useState<{ id: string; message: string }[]>([]);
   const [isSuggestLoading, setSuggestLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isTyping, setIsTyping] = useState(false); // Simulate AI typing
 
   const fetchSuggestedMessages = async () => {
     setSuggestLoading(true);
     setError(null);
+    setIsTyping(true); // Start typing animation
 
     const timeout = setTimeout(() => {
       setSuggestLoading(false);
+      setIsTyping(false);
     }, 4000);
 
     try {
@@ -61,7 +65,16 @@ const SendMessage = () => {
       
       const response = await axios.post(apiUrl);
       console.log('Suggested messages response:', response.data);
-      setSuggestions(response.data.suggestions || []);
+
+      // Simulate AI generating suggestions one by one
+      if (response.data.suggestions) {
+        setSuggestions([]); // Clear previous suggestions
+        for (let i = 0; i < response.data.suggestions.length; i++) {
+          setTimeout(() => {
+            setSuggestions((prev) => [...prev, response.data.suggestions[i]]);
+          }, i * 800); // Delay between suggestions
+        }
+      }
     } catch (err) {
       const axiosError = err as AxiosError<{ message: string }>;
       console.error('Error fetching suggested messages:', axiosError);
@@ -69,6 +82,7 @@ const SendMessage = () => {
     } finally {
       clearTimeout(timeout);
       setSuggestLoading(false);
+      setIsTyping(false);
     }
   };
 
@@ -121,7 +135,7 @@ const SendMessage = () => {
     <div className="max-w-4xl mx-auto space-y-8">
       <Card>
         <CardHeader>
-          <h3 className="text-xl font-semibold">Send a Message</h3>
+          <h3 className="text-xl font-semibold">Send a Message to {username}</h3>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -131,7 +145,7 @@ const SendMessage = () => {
                 name="content"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Your Message</FormLabel>
+                    <FormLabel>Your Message to {username}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -177,26 +191,35 @@ const SendMessage = () => {
                 <div className="loader-dot"></div>
                 <div className="loader-dot"></div>
               </div>
-              <div className="absolute flex items-center justify-center text-lg font-semibold text-gray-600">Loading...</div>
+              <div className="absolute flex items-center justify-center text-lg font-semibold text-gray-600">
+                {isTyping ? 'Thinking of the perfect message...' : 'Loading...'}
+              </div>
             </div>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : suggestions.length > 0 ? (
-            suggestions.map((suggestion: { id: string; message: string }) => (
-              <Button
-                key={suggestion.id}
-                variant="outline"
-                className="mb-2"
-                onClick={() => handleMessageClick(suggestion.message)}
-              >
-                {suggestion.message}
-              </Button>
-            ))
+            <div className="space-y-2">
+              {suggestions.map((suggestion) => (
+                <Button
+                  key={suggestion.id}
+                  variant="outline"
+                  className="w-full text-left hover:bg-gray-100 transition-colors"
+                  onClick={() => handleMessageClick(suggestion.message)}
+                >
+                  {suggestion.message}
+                </Button>
+              ))}
+            </div>
           ) : (
             <p className="text-gray-500">No messages to suggest at the moment.</p>
           )}
         </CardContent>
       </Card>
+      
+      <div className="text-center mt-8">
+        <h3 className="text-lg font-semibold">Start receiving anonymous messages with TrueFeedback! Engage in open, honest, and meaningful conversations today.</h3>
+        <Button onClick={() => router.push('/')} className="mt-4">Go to Home</Button>
+      </div>
     </div>
   );
 };
