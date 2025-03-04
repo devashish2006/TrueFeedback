@@ -18,25 +18,53 @@ export async function GET(request: Request) {
 
   const userId = new mongoose.Types.ObjectId(_user._id);
   try {
+    // First check if the user exists at all
+    const userExists = await UserModel.findById(userId);
+    
+    if (!userExists) {
+      return Response.json(
+        { message: 'User not found', success: false },
+        { status: 404 }
+      );
+    }
+    
+    // If user exists but may not have messages, proceed with aggregation
     const user = await UserModel.aggregate([
+      { $match: { _id: userId } },
+      {
+        $project: {
+          messagesExist: { $cond: { if: { $isArray: "$messages" }, then: { $size: "$messages" }, else: 0 } },
+          messages: 1
+        }
+      }
+    ]).exec();
+    
+    // Check if messages array exists and has items
+    if (user[0].messagesExist === 0) {
+      return Response.json(
+        { 
+          messages: [], 
+          message: 'No messages to display',
+          success: true 
+        },
+        { status: 200 }
+      );
+    }
+    
+    // If we have messages, do the sorting
+    const userWithSortedMessages = await UserModel.aggregate([
       { $match: { _id: userId } },
       { $unwind: '$messages' },
       { $sort: { 'messages.createdAt': -1 } },
       { $group: { _id: '$_id', messages: { $push: '$messages' } } },
     ]).exec();
 
-    if (!user || user.length === 0) {
-      return Response.json(
-        { message: 'User not found', success: false },
-        { status: 404 }
-      );
-    }
-
     return Response.json(
-      { messages: user[0].messages },
-      {
-        status: 200,
-      }
+      { 
+        messages: userWithSortedMessages[0].messages,
+        success: true 
+      },
+      { status: 200 }
     );
   } catch (error) {
     console.error('An unexpected error occurred:', error);

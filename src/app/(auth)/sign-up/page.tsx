@@ -28,6 +28,7 @@ import { motion } from 'framer-motion';
 export default function SignUpForm() {
     const [username, setUsername] = useState('');
     const [usernameMessage, setUsernameMessage] = useState('');
+    const [isUsernameUnique, setIsUsernameUnique] = useState<boolean | null>(null);
     const [isCheckingUsername, setIsCheckingUsername] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [debouncedUsername] = useDebounce(username, 300);
@@ -49,17 +50,21 @@ export default function SignUpForm() {
             if (debouncedUsername.trim()) {
                 setIsCheckingUsername(true);
                 setUsernameMessage('');
+                setIsUsernameUnique(null);
                 try {
                     const response = await axios.get<ApiResponse>(`/api/check-username-unique?username=${debouncedUsername}`);
                     setUsernameMessage(response.data.message);
+                    setIsUsernameUnique(response.data.success);
                 } catch (error) {
                     const axiosError = error as AxiosError<ApiResponse>;
                     setUsernameMessage(axiosError.response?.data.message ?? 'Error checking username');
+                    setIsUsernameUnique(false);
                 } finally {
                     setIsCheckingUsername(false);
                 }
             } else {
                 setUsernameMessage('');
+                setIsUsernameUnique(null);
             }
         };
 
@@ -122,16 +127,23 @@ export default function SignUpForm() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="text-gray-300">Username</FormLabel>
-                                    <Input
-                                        {...field}
-                                        onChange={(e) => {
-                                            field.onChange(e);
-                                            setUsername(e.target.value);
-                                        }}
-                                        className="bg-gray-700 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500"
-                                    />
+                                    <div className="relative">
+                                        <Input
+                                            {...field}
+                                            onChange={(e) => {
+                                                field.onChange(e);
+                                                setUsername(e.target.value);
+                                            }}
+                                            className="bg-gray-700 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500"
+                                        />
+                                        {isCheckingUsername && (
+                                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                                <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                                            </div>
+                                        )}
+                                    </div>
                                     {!isCheckingUsername && usernameMessage && (
-                                        <p className={`text-sm ${usernameMessage === 'Username is unique' ? 'text-green-500' : 'text-red-500'}`}>
+                                        <p className={`text-sm mt-1 ${isUsernameUnique ? 'text-green-500' : 'text-red-500'}`}>
                                             {usernameMessage}
                                         </p>
                                     )}

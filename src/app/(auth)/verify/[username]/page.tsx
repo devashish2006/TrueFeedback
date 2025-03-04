@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { verifySchema } from "@/schemas/verifySchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams } from "next/navigation";
-import { useRouter } from 'next/navigation';
 import { useForm } from "react-hook-form";
 import { toast, useToast } from "@/hooks/use-toast";
 import axios from "axios";
@@ -15,13 +14,16 @@ import { Form, FormField, FormItem, FormLabel, FormMessage } from "@/components/
 import { Button } from '@/components/ui/button';
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { signIn } from "next-auth/react";
 
 export default function VerifyCode() {
-    const router = useRouter();
     const params = useParams<{ username: string }>();
     const { toast } = useToast();
     const form = useForm<z.infer<typeof verifySchema>>({
         resolver: zodResolver(verifySchema),
+        defaultValues: {
+            code: '',
+        }
     });
 
     const [otp, setOtp] = useState<string[]>(new Array(6).fill(''));
@@ -33,6 +35,9 @@ export default function VerifyCode() {
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
+
+        const combinedCode = newOtp.join('');
+        form.setValue('code', combinedCode, { shouldValidate: true });
 
         if (value && index < 5) {
             inputRefs.current[index + 1]?.focus();
@@ -49,7 +54,7 @@ export default function VerifyCode() {
         try {
             const response = await axios.post<ApiResponse>(`/api/verify-code`, {
                 username: params.username,
-                code: otp.join('')
+                code: data.code 
             });
 
             toast({
@@ -57,7 +62,7 @@ export default function VerifyCode() {
                 description: response.data.message,
             });
 
-            router.replace('/sign-in');
+            signIn(); // Redirect to NextAuth sign-in page
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
             toast({

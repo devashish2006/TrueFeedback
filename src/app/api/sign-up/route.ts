@@ -30,6 +30,13 @@ export async function POST(request: Request) {
             );
         }
 
+        // Check if an unverified user with the same username exists
+        const existingUnverifiedUserByUsername = await UserModel.findOne({
+            username,
+            isVerified: false,
+        });
+        console.log("Existing unverified user with username:", existingUnverifiedUserByUsername);
+
         // Check if a user with the same email exists
         const existingUserByEmail = await UserModel.findOne({ email });
         console.log("Existing user with email:", existingUserByEmail);
@@ -37,7 +44,43 @@ export async function POST(request: Request) {
         const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
         console.log("Generated verification code:", verifyCode);
 
-        if (existingUserByEmail) {
+        if (existingUnverifiedUserByUsername) {
+            console.log("Updating existing unverified user with same username");
+            const hashedPassword = await bcrypt.hash(password, 10);
+            console.log("Hashed password:", hashedPassword);
+
+            existingUnverifiedUserByUsername.email = email;
+            existingUnverifiedUserByUsername.password = hashedPassword;
+            existingUnverifiedUserByUsername.verifyCode = verifyCode;
+            existingUnverifiedUserByUsername.verifyCodeExpiry = new Date(Date.now() + 3600000);
+            await existingUnverifiedUserByUsername.save();
+            console.log("Updated unverified user in database:", existingUnverifiedUserByUsername);
+
+            // Send verification email to the updated email address
+            console.log("Attempting to send verification email to:", email);
+            const emailResponse = await sendVerificationEmail(email, username, verifyCode);
+            console.log("Email sending response:", emailResponse);
+
+            if (!emailResponse.success) {
+                console.error("Failed to send verification email:", emailResponse.message);
+                return Response.json(
+                    {
+                        success: false,
+                        message: emailResponse.message,
+                    },
+                    { status: 500 }
+                );
+            }
+
+            return Response.json(
+                {
+                    success: true,
+                    message: "User information updated. Please verify your email.",
+                },
+                { status: 200 }
+            );
+        }
+        else if (existingUserByEmail) {
             if (existingUserByEmail.isVerified) {
                 console.log("User already exists and is verified:", email);
                 return Response.json(
@@ -52,6 +95,7 @@ export async function POST(request: Request) {
                 const hashedPassword = await bcrypt.hash(password, 10);
                 console.log("Hashed password:", hashedPassword);
 
+                existingUserByEmail.username = username;
                 existingUserByEmail.password = hashedPassword;
                 existingUserByEmail.verifyCode = verifyCode;
                 existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000);

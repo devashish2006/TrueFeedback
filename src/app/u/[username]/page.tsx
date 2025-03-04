@@ -1,13 +1,9 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Card,
-  CardHeader,
-  CardContent,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -107,25 +103,28 @@ const SendMessage = () => {
       toast({
         title: 'Error',
         description:
-          axiosError.response?.data?.message || 'An error occurred. Please try again.',
+          axiosError.response?.data?.message ||
+          'An error occurred. Please try again.',
         variant: 'destructive',
       });
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8">
       {/* Logo Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center mb-8"
+        className="text-center mb-8 px-2"
       >
-        <h1 className="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">
+        <h1 className="text-4xl sm:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">
           TrueFeedback
         </h1>
-        <p className="text-gray-300 mt-2 text-lg">Your Anonymous Feedback Platform</p>
+        <p className="text-gray-300 mt-2 text-base sm:text-lg">
+          Your Anonymous Feedback Platform
+        </p>
       </motion.div>
 
       {/* Send Message Card */}
@@ -133,11 +132,13 @@ const SendMessage = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="w-full max-w-2xl"
+        className="w-full max-w-md sm:max-w-lg"
       >
         <Card className="bg-gray-800 border-gray-700 shadow-xl">
           <CardHeader>
-            <h3 className="text-2xl font-semibold text-gray-100">Send a Message to {username}</h3>
+            <h3 className="text-xl sm:text-2xl font-semibold text-gray-100">
+              Send a Message to {username}
+            </h3>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -147,7 +148,9 @@ const SendMessage = () => {
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-300">Your Message to {username}</FormLabel>
+                      <FormLabel className="text-gray-300">
+                        Your Message to {username}
+                      </FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
@@ -183,11 +186,13 @@ const SendMessage = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="w-full max-w-2xl mt-8"
+        className="w-full max-w-md sm:max-w-lg mt-8"
       >
         <Card className="bg-gray-800 border-gray-700 shadow-xl">
           <CardHeader>
-            <h3 className="text-2xl font-semibold text-gray-100">Suggested Messages</h3>
+            <h3 className="text-xl sm:text-2xl font-semibold text-gray-100">
+              Suggested Messages
+            </h3>
           </CardHeader>
           <CardContent>
             <Button
@@ -204,16 +209,16 @@ const SendMessage = () => {
             </Button>
 
             {isSuggestLoading ? (
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex flex-col items-center justify-center space-y-2">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
-                <p className="text-gray-300">
+                <p className="text-gray-300 text-center">
                   {isTyping ? 'Thinking of the perfect message...' : 'Loading...'}
                 </p>
               </div>
             ) : error ? (
               <p className="text-red-500 text-center">{error}</p>
             ) : suggestions.length > 0 ? (
-              <div className="space-y-3">
+              <div className="max-h-64 overflow-y-auto space-y-3">
                 {suggestions.map((suggestion) => (
                   <Button
                     key={suggestion.id}
@@ -226,7 +231,9 @@ const SendMessage = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center">No messages to suggest at the moment.</p>
+              <p className="text-gray-500 text-center">
+                No messages to suggest at the moment.
+              </p>
             )}
           </CardContent>
         </Card>
@@ -237,10 +244,11 @@ const SendMessage = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
-        className="text-center mt-8"
+        className="text-center mt-8 px-2"
       >
-        <h3 className="text-lg font-semibold text-gray-300">
-          Start receiving anonymous messages with TrueFeedback! Engage in open, honest, and meaningful conversations today.
+        <h3 className="text-base sm:text-lg font-semibold text-gray-300">
+          Start receiving anonymous messages with TrueFeedback! Engage in open,
+          honest, and meaningful conversations today.
         </h3>
         <Button
           onClick={() => router.push('/')}

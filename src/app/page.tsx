@@ -106,7 +106,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="text-center p-4 md:p-6 bg-gray-950">
         <div className="mb-4">
-          <p className="text-lg font-semibold text-gray-300">Connect With ME :)</p>
+          <p className="text-lg font-semibold text-gray-300">I’d love to hear from you. Feel free to drop a message or find me on </p>
         </div>
 
         {/* Social Media Links */}

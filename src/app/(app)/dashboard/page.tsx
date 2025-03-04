@@ -140,42 +140,48 @@ function UserDashboard() {
   };
 
   return (
-    <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-w-6xl">
+    <div className="my-8 mx-4 sm:mx-6 md:mx-8 lg:mx-auto p-6 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-w-6xl">
       {/* Logo Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center mb-8"
+        className="text-center mb-8 px-4"
       >
-        <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500 leading-tight">
           TrueFeedback
         </h1>
-        <p className="text-gray-300 mt-2">Your Anonymous Feedback Platform</p>
+        <p className="text-gray-300 mt-2 text-sm sm:text-base">
+          Your Anonymous Feedback Platform
+        </p>
       </motion.div>
 
+      {/* Dashboard Heading */}
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500"
+        className="text-2xl sm:text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500 text-center"
       >
         User Dashboard
       </motion.h1>
 
+      {/* Unique Link Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
         className="mb-4"
       >
-        <h2 className="text-lg font-semibold mb-2 text-gray-300">Copy Your Unique Link</h2>
-        <div className="flex items-center">
+        <h2 className="text-lg font-semibold mb-2 text-gray-300">
+          Copy Your Unique Link
+        </h2>
+        <div className="flex flex-col sm:flex-row items-stretch gap-2">
           <input
             type="text"
             value={profileUrl}
             disabled
-            className="input input-bordered w-full p-2 mr-2 bg-gray-700 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500"
+            className="input input-bordered w-full p-2 bg-gray-700 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500"
           />
           <Button
             onClick={copyToClipboard}
@@ -186,11 +192,12 @@ function UserDashboard() {
         </div>
       </motion.div>
 
+      {/* Accept Messages Toggle */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="mb-4"
+        className="mb-4 flex items-center justify-center"
       >
         <Switch
           {...register('acceptMessages')}
@@ -206,11 +213,12 @@ function UserDashboard() {
 
       <Separator className="bg-gray-700" />
 
+      {/* Refresh Messages Button */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
-        className="mt-4"
+        className="mt-4 flex justify-center"
       >
         <Button
           variant="outline"
@@ -228,11 +236,12 @@ function UserDashboard() {
         </Button>
       </motion.div>
 
+      {/* Messages Grid */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.8 }}
-        className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6"
+        className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4"
       >
         {messages.length > 0 ? (
           messages.map((message, index) => (
@@ -243,15 +252,18 @@ function UserDashboard() {
             />
           ))
         ) : (
-          <p className="text-gray-300">No messages to display.</p>
+          <p className="text-gray-300 text-center">
+            No messages to display.
+          </p>
         )}
       </motion.div>
 
+      {/* Logout Button */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 1 }}
-        className="mt-8"
+        className="mt-8 flex justify-center"
       >
         <Button
           variant="destructive"
