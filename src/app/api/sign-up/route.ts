@@ -12,33 +12,35 @@ export async function POST(request: Request) {
         const { username, email, password } = await request.json();
         console.log("Received data:", { username, email });
 
-        // Check if a verified user with the same username already exists
+        // Case-insensitive check for existing verified username
         const existingUserVerifiedByUsername = await UserModel.findOne({
-            username,
+            username: { $regex: new RegExp(`^${username}$`, "i") }, // Case-insensitive search
             isVerified: true,
         });
         console.log("Existing verified user with username:", existingUserVerifiedByUsername);
 
         if (existingUserVerifiedByUsername) {
-            console.log("Username already taken:", username);
+            console.log("Username already taken (case-insensitive):", username);
             return Response.json(
                 {
                     success: false,
-                    message: "Username is already taken",
+                    message: "Username is already taken. Please choose a different username.",
                 },
                 { status: 400 }
             );
         }
 
-        // Check if an unverified user with the same username exists
+        // Case-insensitive check for existing unverified username
         const existingUnverifiedUserByUsername = await UserModel.findOne({
-            username,
+            username: { $regex: new RegExp(`^${username}$`, "i") }, // Case-insensitive search
             isVerified: false,
         });
         console.log("Existing unverified user with username:", existingUnverifiedUserByUsername);
 
-        // Check if a user with the same email exists
-        const existingUserByEmail = await UserModel.findOne({ email });
+        // Case-insensitive check for existing email
+        const existingUserByEmail = await UserModel.findOne({
+            email: { $regex: new RegExp(`^${email}$`, "i") }, // Case-insensitive search
+        });
         console.log("Existing user with email:", existingUserByEmail);
 
         const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -79,14 +81,13 @@ export async function POST(request: Request) {
                 },
                 { status: 200 }
             );
-        }
-        else if (existingUserByEmail) {
+        } else if (existingUserByEmail) {
             if (existingUserByEmail.isVerified) {
                 console.log("User already exists and is verified:", email);
                 return Response.json(
                     {
                         success: false,
-                        message: "User already exists with this email",
+                        message: "User already exists with this email.",
                     },
                     { status: 400 }
                 );
@@ -154,7 +155,7 @@ export async function POST(request: Request) {
         return Response.json(
             {
                 success: false,
-                message: "Error in registering user",
+                message: "Error in registering user.",
             },
             { status: 500 }
         );

@@ -106,7 +106,9 @@ export default function Home() {
       {/* Footer */}
       <footer className="text-center p-4 md:p-6 bg-gray-950">
         <div className="mb-4">
-          <p className="text-lg font-semibold text-gray-300">I’d love to hear from you. Feel free to drop a message or find me on </p>
+          <p className="text-lg font-semibold text-gray-300">
+            I’d love to hear from you. Feel free to drop a message or connect with me on:
+          </p>
         </div>
 
         {/* Social Media Links */}
@@ -114,7 +116,7 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.5 }}
-          className="flex justify-center space-x-6"
+          className="flex justify-center space-x-6 mb-4"
         >
           <a
             href="https://github.com/devashish2006"
@@ -142,11 +144,22 @@ export default function Home() {
           </a>
         </motion.div>
 
-        {/* Copyright */}
+        {/* Copyright and Developer Credit */}
         <div className="mt-4 text-sm text-gray-500">
           © 2025 True Feedback. All rights reserved.
+        </div>
+        <div className="mt-2 text-sm text-gray-400">
+          Developed with ❤️ by{" "}
+          <a
+            href="https://github.com/devashish2006"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors"
+          >
+            Devashish Mishra
+          </a>
         </div>
       </footer>
     </div>
   );
-}
+} 
