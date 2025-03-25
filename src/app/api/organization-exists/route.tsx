@@ -4,11 +4,9 @@ import OrganizationModel from '@/model/organisation';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/options';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// Modern Next.js configuration
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,29 +14,31 @@ export async function GET(req: NextRequest) {
 
     // Retrieve session using NextAuth
     const session = await getServerSession(authOptions);
-    console.log("Session from API:", session);
-    if (!session || !session.user || !session.user.username) {
-      console.log("Session or username not found.");
-      return NextResponse.json({ organization: false }, { status: 200 });
+    
+    if (!session?.user?.username) {
+      return NextResponse.json(
+        { organization: false },
+        { status: 200 }
+      );
     }
 
     const username = session.user.username;
-    console.log("Username from session:", username);
 
-    // Use a case-insensitive query to match the username
+    // Case-insensitive search for organization
     const organization = await OrganizationModel.findOne({
-      username: { $regex: `^${username}$`, $options: 'i' },
+      username: { $regex: new RegExp(`^${username}$`, 'i') }
     }).lean().exec();
 
-    console.log("Organization query result:", organization);
+    return NextResponse.json(
+      { organization: !!organization },
+      { status: 200 }
+    );
 
-    if (organization) {
-      return NextResponse.json({ organization: true }, { status: 200 });
-    } else {
-      return NextResponse.json({ organization: false }, { status: 200 });
-    }
   } catch (error) {
     console.error("Error checking organization existence:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
