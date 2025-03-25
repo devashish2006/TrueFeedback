@@ -50,20 +50,22 @@ const SendMessageOrg = () => {
     defaultValues: { content: '' },
   });
 
-  // Fetch organization details from your API endpoint
-  const fetchOrgDetails = useCallback(async () => {
-    try {
-      const res = await axios.get('/api/getOrganisationDetails');
-      setOrg(res.data.organization);
-    } catch (err) {
-      console.error('Error fetching organization details:', err);
-      toast({
-        title: 'Error',
-        description: 'Failed to load organization details.',
-        variant: 'destructive',
-      });
-    }
-  }, [toast]);
+  // Fetch organization details from your API endpoint using orgUsername from the URL.
+const fetchOrgDetails = useCallback(async () => {
+  try {
+    // Pass the orgUsername as a query parameter to the API
+    const res = await axios.get(`/api/publicOrganisationDetails?orgUsername=${orgUsername}`);
+    setOrg(res.data.organization);
+  } catch (err) {
+    console.error('Error fetching organization details:', err);
+    toast({
+      title: 'Error',
+      description: 'Failed to load organization details.',
+      variant: 'destructive',
+    });
+  }
+}, [orgUsername, toast]);
+
 
   useEffect(() => {
     fetchOrgDetails();
