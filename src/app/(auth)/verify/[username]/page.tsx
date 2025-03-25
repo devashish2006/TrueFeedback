@@ -3,13 +3,12 @@
 import { Input } from '@/components/ui/input';
 import { verifySchema } from "@/schemas/verifySchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast, useToast } from "@/hooks/use-toast";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import * as z from 'zod';
 import { ApiResponse } from "../../../../../types/ApiResponse";
-import { AxiosError } from "axios";
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from '@/components/ui/button';
 import { useEffect, useRef, useState } from 'react';
@@ -18,6 +17,7 @@ import { signIn } from "next-auth/react";
 
 export default function VerifyCode() {
     const params = useParams<{ username: string }>();
+    const router = useRouter();
     const { toast } = useToast();
     const form = useForm<z.infer<typeof verifySchema>>({
         resolver: zodResolver(verifySchema),
@@ -62,7 +62,9 @@ export default function VerifyCode() {
                 description: response.data.message,
             });
 
-            signIn(); // Redirect to NextAuth sign-in page
+            // Use NextAuth's signIn with a callback URL
+            signIn(undefined, { callbackUrl: "/ask" });
+        
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
             toast({
