@@ -12,19 +12,19 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 
 dotenv.config();
 
-// Configure Cloudinary
+// Cloudinary configuration
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Set runtime to Node.js and disable static optimization
+// Next.js route configuration
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 class BufferReadable extends Readable {
-  private sent: boolean = false;
+  private sent = false;
   constructor(private buffer: Buffer) {
     super();
   }
@@ -49,14 +49,14 @@ async function toNodeRequest(req: NextRequest): Promise<IncomingMessage> {
   return nodeReq;
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    // Ensure database connection
+    // Database connection
     if (mongoose.connection.readyState !== 1) {
       await mongoose.connect(process.env.MONGODB_URI as string);
     }
 
-    // Verify user session
+    // Session verification
     const session = await getServerSession(authOptions);
     if (!session?.user?.username) {
       return NextResponse.json(
@@ -64,102 +64,88 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
-    const userUsername = session.user.username;
+    const username = session.user.username;
 
-    // Parse form data
+    // Form parsing
     const nodeReq = await toNodeRequest(req);
     const form = new IncomingForm();
 
-    return new Promise((resolve) => {
-      form.parse(nodeReq, async (err, fields, files) => {
-        if (err) {
-          return resolve(
-            NextResponse.json(
-              { error: "Error parsing form data" },
-              { status: 400 }
-            )
-          );
-        }
-
-        // Validate input fields
-        const name = fields.name?.[0]?.trim();
-        const description = fields.description?.[0]?.trim();
-        const logo = files.logo?.[0] as File | undefined;
-
-        if (!name || name.length < 3) {
-          return resolve(
-            NextResponse.json(
-              { error: "Organization name must be at least 3 characters" },
-              { status: 400 }
-            )
-          );
-        }
-
-        if (!description || description.length < 10) {
-          return resolve(
-            NextResponse.json(
-              { error: "Description must be at least 10 characters" },
-              { status: 400 }
-            )
-          );
-        }
-
-        if (!logo) {
-          return resolve(
-            NextResponse.json(
-              { error: "Organization logo is required" },
-              { status: 400 }
-            )
-          );
-        }
-
-        try {
-          // Upload logo to Cloudinary
-          const uploadResult = await cloudinary.uploader.upload(logo.filepath, {
-            folder: "organization_logos",
-          });
-
-          // Clean up temporary file
-          fs.unlinkSync(logo.filepath);
-
-          // Create new organization
-          const newOrg = new Organization({
-            username: userUsername,
-            name,
-            description,
-            logoUrl: uploadResult.secure_url,
-          });
-
-          await newOrg.save();
-
-          return resolve(
-            NextResponse.json(
-              {
-                success: true,
-                message: "Organization created successfully",
-                organization: newOrg,
-              },
-              { status: 201 }
-            )
-          );
-        } catch (uploadError) {
-          console.error("Upload error:", uploadError);
-          if (logo?.filepath) {
-            try {
-              fs.unlinkSync(logo.filepath);
-            } catch (error) {
-              // Ignore deletion errors
-            }
-          }
-          return resolve(
-            NextResponse.json(
-              { error: "Failed to upload organization logo" },
-              { status: 500 }
-            )
-          );
-        }
+    // Process form data
+    const formData = await new Promise<{ fields: any; files: any }>((resolve, reject) => {
+      form.parse(nodeReq, (err, fields, files) => {
+        if (err) reject(err);
+        else resolve({ fields, files });
       });
     });
+
+    // Input validation
+    const name = formData.fields.name?.[0]?.trim();
+    const description = formData.fields.description?.[0]?.trim();
+    const logo = formData.files.logo?.[0] as File | undefined;
+
+    if (!name || name.length < 3) {
+      return NextResponse.json(
+        { error: "Organization name must be at least 3 characters" },
+        { status: 400 }
+      );
+    }
+
+    if (!description || description.length < 10) {
+      return NextResponse.json(
+        { error: "Description must be at least 10 characters" },
+        { status: 400 }
+      );
+    }
+
+    if (!logo) {
+      return NextResponse.json(
+        { error: "Organization logo is required" },
+        { status: 400 }
+      );
+    }
+
+    try {
+      // Cloudinary upload
+      const uploadResult = await cloudinary.uploader.upload(logo.filepath, {
+        folder: "organization_logos",
+      });
+
+      // Clean up temp file
+      fs.unlinkSync(logo.filepath);
+
+      // Create organization
+      const newOrg = new Organization({
+        username,
+        name,
+        description,
+        logoUrl: uploadResult.secure_url,
+      });
+      await newOrg.save();
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Organization created successfully",
+          organization: newOrg,
+        },
+        { status: 201 }
+      );
+
+    } catch (uploadError) {
+      console.error("Upload error:", uploadError);
+      if (logo?.filepath) {
+        try {
+          fs.unlinkSync(logo.filepath);
+        } catch (cleanupError) {
+          console.error("Failed to clean up temp file:", cleanupError);
+        }
+      }
+      return NextResponse.json(
+        { error: "Failed to upload organization logo" },
+        { status: 500 }
+      );
+    }
+
   } catch (error) {
     console.error("Server error:", error);
     return NextResponse.json(
