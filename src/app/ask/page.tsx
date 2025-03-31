@@ -8,8 +8,6 @@ const UserTypeSelection = () => {
   const handleSelection = (type: string) => {
     if (type === "individual") {
       router.push("/dashboard");
-    } else if (type === "organization") {
-      router.push("/organisationDetails");
     }
   };
 
@@ -25,10 +23,11 @@ const UserTypeSelection = () => {
             Individual
           </button>
           <button
-            className="px-6 py-3 bg-green-500 hover:bg-green-600 rounded-lg text-lg transition"
-            onClick={() => handleSelection("organization")}
+            className="px-6 py-3 bg-gray-600 cursor-not-allowed rounded-lg text-lg opacity-50 relative"
+            disabled
           >
-            Organization
+            Organization (Beta)
+            <span className="absolute top-0 right-0 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full transform translate-x-1/2 -translate-y-1/2">Beta</span>
           </button>
         </div>
       </div>
