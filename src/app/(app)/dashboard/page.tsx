@@ -144,13 +144,14 @@ function UserDashboard() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-black/90 backdrop-blur-lg border-b border-orange-500/20 px-6 py-4 flex justify-between items-center sticky top-0 z-50"
+        className="bg-black/90 backdrop-blur-lg border-b border-orange-500/20 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-50"
       >
         <div className="flex items-center">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 mr-3 flex items-center justify-center shadow-lg">
-            <BarChart3 size={20} className="text-white" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 mr-2 sm:mr-3 flex items-center justify-center shadow-lg">
+            <BarChart3 size={16} className="sm:hidden text-white" />
+            <BarChart3 size={20} className="hidden sm:block text-white" />
           </div>
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-lg sm:text-2xl font-bold">
             <span className="text-orange-500">True</span>
             <span className="text-white">Feedback</span>
           </h1>
@@ -158,26 +159,27 @@ function UserDashboard() {
         <Button
           onClick={handleLogout}
           variant="ghost"
-          className="bg-white/5 hover:bg-white/10 text-white font-medium flex items-center px-6 py-2 rounded-xl transition-all duration-300 border border-white/10 hover:border-orange-500/30"
+          className="bg-white/5 hover:bg-white/10 text-white font-medium flex items-center px-3 sm:px-6 py-2 rounded-xl transition-all duration-300 border border-white/10 hover:border-orange-500/30 text-sm sm:text-base"
         >
-          <LogOut className="h-4 w-4 mr-2" /> 
-          Logout
+          <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> 
+          <span className="hidden sm:inline">Logout</span>
+          <span className="sm:hidden">Exit</span>
         </Button>
       </motion.nav>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
         {/* Welcome Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-12 text-center"
+          className="mb-8 sm:mb-12 text-center"
         >
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-2 sm:mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 px-2">
             Welcome back, {username}
           </h1>
-          <p className="text-xl text-gray-400 font-light">Your premium feedback management hub</p>
+          <p className="text-lg sm:text-xl text-gray-400 font-light px-4">Your premium feedback management hub</p>
         </motion.div>
 
         {/* Stats Cards */}
@@ -185,68 +187,68 @@ function UserDashboard() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12"
         >
-          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
-                <MessageSquare className="h-6 w-6 text-white" />
+          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
+                <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-orange-500">{messages.length}</span>
+              <span className="text-xl sm:text-2xl font-bold text-orange-500">{messages.length}</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-1">Total Messages</h3>
-            <p className="text-gray-400 text-sm">Anonymous feedback received</p>
+            <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Total Messages</h3>
+            <p className="text-gray-400 text-xs sm:text-sm">Anonymous feedback received</p>
           </div>
 
-          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
-                <Users className="h-6 w-6 text-white" />
+          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-orange-500">{acceptMessages ? 'ON' : 'OFF'}</span>
+              <span className="text-xl sm:text-2xl font-bold text-orange-500">{acceptMessages ? 'ON' : 'OFF'}</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-1">Status</h3>
-            <p className="text-gray-400 text-sm">Message acceptance</p>
+            <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Status</h3>
+            <p className="text-gray-400 text-xs sm:text-sm">Message acceptance</p>
           </div>
 
-          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-white" />
+          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300 sm:col-span-2 md:col-span-1">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-orange-500">100%</span>
+              <span className="text-xl sm:text-2xl font-bold text-orange-500">100%</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-1">Privacy</h3>
-            <p className="text-gray-400 text-sm">Completely anonymous</p>
+            <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Privacy</h3>
+            <p className="text-gray-400 text-xs sm:text-sm">Completely anonymous</p>
           </div>
         </motion.div>
 
         {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
           {/* Share Profile Card */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="col-span-1 xl:col-span-2 bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl p-8 border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300 shadow-2xl"
+            className="col-span-1 lg:col-span-2 bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300 shadow-2xl"
           >
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 mr-4 flex items-center justify-center">
-                <Copy className="h-6 w-6 text-white" />
+            <div className="flex items-center mb-4 sm:mb-6">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 mr-3 sm:mr-4 flex items-center justify-center">
+                <Copy className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-white">Share Your Profile</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-white">Share Your Profile</h2>
             </div>
-            <p className="text-gray-400 mb-6">Share this link to receive anonymous feedback from anyone</p>
-            <div className="flex flex-col sm:flex-row items-stretch gap-4">
+            <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">Share this link to receive anonymous feedback from anyone</p>
+            <div className="flex flex-col gap-3 sm:gap-4">
               <input
                 type="text"
                 value={profileUrl}
                 disabled
-                className="flex-1 p-4 bg-black/40 text-gray-200 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono text-sm"
+                className="w-full p-3 sm:p-4 bg-black/40 text-gray-200 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono text-xs sm:text-sm break-all"
               />
               <Button
                 onClick={copyToClipboard}
-                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/25"
+                className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/25"
               >
                 <Copy className="h-4 w-4 mr-2" />
                 Copy Link
@@ -259,29 +261,31 @@ function UserDashboard() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl p-8 border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300 shadow-2xl"
+            className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300 shadow-2xl"
           >
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 mr-4 flex items-center justify-center">
-                <Bell className="h-6 w-6 text-white" />
+            <div className="flex items-center mb-4 sm:mb-6">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 mr-3 sm:mr-4 flex items-center justify-center">
+                <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-white">Settings</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-white">Settings</h2>
             </div>
-            <div className="space-y-6">
-              <div className="flex items-center justify-between p-4 bg-black/30 rounded-xl border border-gray-700/50">
-                <div>
-                  <span className="text-white font-medium">Accept Messages</span>
-                  <p className="text-gray-400 text-sm mt-1">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="flex items-center justify-between p-3 sm:p-4 bg-black/30 rounded-xl border border-gray-700/50">
+                <div className="flex-1 min-w-0">
+                  <span className="text-white font-medium text-sm sm:text-base">Accept Messages</span>
+                  <p className="text-gray-400 text-xs sm:text-sm mt-1">
                     {acceptMessages ? 'Currently receiving messages' : 'Messages are disabled'}
                   </p>
                 </div>
-                <Switch
-                  {...register('acceptMessages')}
-                  checked={acceptMessages}
-                  onCheckedChange={handleSwitchChange}
-                  disabled={isSwitchLoading}
-                  className="data-[state=checked]:bg-orange-500 data-[state=unchecked]:bg-gray-600"
-                />
+                <div className="ml-3 sm:ml-4">
+                  <Switch
+                    {...register('acceptMessages')}
+                    checked={acceptMessages}
+                    onCheckedChange={handleSwitchChange}
+                    disabled={isSwitchLoading}
+                    className="data-[state=checked]:bg-orange-500 data-[state=unchecked]:bg-gray-600"
+                  />
+                </div>
               </div>
             </div>
           </motion.div>
@@ -292,32 +296,33 @@ function UserDashboard() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl p-8 border border-orange-500/20 shadow-2xl"
+          className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-orange-500/20 shadow-2xl"
         >
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
             <div className="flex items-center">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 mr-4 flex items-center justify-center">
-                <MessageSquare className="h-6 w-6 text-white" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 mr-3 sm:mr-4 flex items-center justify-center">
+                <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <h2 className="text-3xl font-bold text-white">Your Messages</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white">Your Messages</h2>
             </div>
             <Button
               variant="outline"
               onClick={() => fetchMessages(true)}
               disabled={isLoading}
-              className="border-orange-500/50 text-orange-400 hover:bg-orange-500/10 hover:border-orange-500 rounded-xl flex items-center gap-3 px-6 py-3 transition-all duration-300"
+              className="w-full sm:w-auto border-orange-500/50 text-orange-400 hover:bg-orange-500/10 hover:border-orange-500 rounded-xl flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 transition-all duration-300 text-sm sm:text-base"
             >
               {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
               ) : (
-                <RefreshCcw className="h-5 w-5" />
+                <RefreshCcw className="h-4 w-4 sm:h-5 sm:w-5" />
               )}
-              Refresh Messages
+              <span className="sm:inline">Refresh Messages</span>
+              <span className="sm:hidden">Refresh</span>
             </Button>
           </div>
 
           {messages.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {messages.map((message, index) => (
                 <motion.div
                   key={message._id}
@@ -333,12 +338,12 @@ function UserDashboard() {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 bg-black/20 rounded-xl border border-gray-700/30">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-orange-500/20 to-orange-600/20 flex items-center justify-center mb-6">
-                <MessageSquare className="h-10 w-10 text-orange-500/60" />
+            <div className="flex flex-col items-center justify-center py-12 sm:py-16 bg-black/20 rounded-xl border border-gray-700/30">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r from-orange-500/20 to-orange-600/20 flex items-center justify-center mb-4 sm:mb-6">
+                <MessageSquare className="h-8 w-8 sm:h-10 sm:w-10 text-orange-500/60" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-300 mb-2">No messages yet</h3>
-              <p className="text-gray-500 text-center max-w-md">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-300 mb-2">No messages yet</h3>
+              <p className="text-gray-500 text-center max-w-md text-sm sm:text-base px-4">
                 Share your profile link to start receiving anonymous feedback from your audience.
               </p>
             </div>
@@ -351,16 +356,17 @@ function UserDashboard() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1 }}
-        className="border-t border-orange-500/10 py-8 text-center"
+        className="border-t border-orange-500/10 py-6 sm:py-8 text-center"
       >
         <div className="flex items-center justify-center mb-2">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 mr-2 flex items-center justify-center">
-            <BarChart3 size={12} className="text-white" />
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 mr-2 flex items-center justify-center">
+            <BarChart3 size={10} className="sm:hidden text-white" />
+            <BarChart3 size={12} className="hidden sm:block text-white" />
           </div>
-          <span className="text-orange-500 font-semibold">True</span>
-          <span className="text-white font-semibold">Feedback</span>
+          <span className="text-orange-500 font-semibold text-sm sm:text-base">True</span>
+          <span className="text-white font-semibold text-sm sm:text-base">Feedback</span>
         </div>
-        <p className="text-gray-500 text-sm">© 2025 • Premium Anonymous Feedback Platform</p>
+        <p className="text-gray-500 text-xs sm:text-sm">© 2025 • Premium Anonymous Feedback Platform</p>
       </motion.footer>
     </div>
   );

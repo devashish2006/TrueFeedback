@@ -172,41 +172,41 @@ export default function CreatePoll() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-950">
       {/* Header */}
-      <header className="bg-black py-4 border-b border-orange-600/30">
-        <div className="container mx-auto px-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <span className="text-orange-500 text-2xl font-bold">FastForwardPolls</span>
-            <span className="ml-2 text-xs text-gray-400">by 
-              <span className="text-orange-500"> True</span>
-              <span className="text-white">Feedback</span>
-              </span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => router.push('/organisationDashboard')}
-              className="text-gray-300 hover:text-orange-500"
-              >
-              Dashboard
-            </button>
-
-            <button
-              onClick={() => router.push('/MyPolls')}
-             className="text-gray-300 hover:text-orange-500">My Polls</button>
-            <button className="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700">
-              Upgrade
-            </button>
+      <header className="bg-black py-3 sm:py-4 border-b border-orange-600/30">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <span className="text-orange-500 text-lg sm:text-2xl font-bold">FastForwardPolls</span>
+              <span className="ml-2 text-xs text-gray-400 hidden md:inline">by 
+                <span className="text-orange-500"> True</span>
+                <span className="text-white">Feedback</span>
+                </span>
+            </div>
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <button
+                onClick={() => router.push('/organisationDashboard')}
+                className="text-gray-300 hover:text-orange-500 text-xs sm:text-sm md:text-base px-2 py-1"
+                >
+                Dashboard
+              </button>
+              <button
+                onClick={() => router.push('/MyPolls')}
+               className="text-gray-300 hover:text-orange-500 text-xs sm:text-sm md:text-base px-2 py-1">
+               My Polls
+               </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-white">Create New Poll</h1>
+          <div className="flex flex-col space-y-3 mb-6 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-white">Create New Poll</h1>
             <div className="flex items-center">
-              <span className="text-orange-500 mr-2"><Award size={20} /></span>
-              <span className="text-gray-300">Premium Features</span>
+              <span className="text-orange-500 mr-2"><Award size={18} /></span>
+              <span className="text-gray-300 text-sm">Premium Features</span>
             </div>
           </div>
 
@@ -214,10 +214,10 @@ export default function CreatePoll() {
           {successMessage && (
             <div className="mb-6 bg-green-900/30 border border-green-600 text-green-400 p-4 rounded-md">
               <div className="flex items-center mb-2">
-                <Check className="text-green-500 mr-2" />
+                <Check className="text-green-500 mr-2 flex-shrink-0" />
                 <span className="font-semibold">{successMessage}</span>
               </div>
-              <p>Your poll is available at: <a href={pollUrl} className="text-orange-500 hover:underline">{pollUrl}</a></p>
+              <p className="text-sm sm:text-base break-all">Your poll is available at: <a href={pollUrl} className="text-orange-500 hover:underline">{pollUrl}</a></p>
             </div>
           )}
 
@@ -225,22 +225,22 @@ export default function CreatePoll() {
           {error && (
             <div className="mb-6 bg-red-900/30 border border-red-600 text-red-400 p-4 rounded-md">
               <div className="flex items-center">
-                <AlertCircle className="text-red-500 mr-2" size={18} />
-                <span className="font-semibold">{error}</span>
+                <AlertCircle className="text-red-500 mr-2 flex-shrink-0" size={18} />
+                <span className="font-semibold text-sm sm:text-base">{error}</span>
               </div>
             </div>
           )}
 
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Poll details */}
-            <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-md">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                <FileText className="mr-2 text-orange-500" size={20} />
+            <div className="bg-gray-900 p-4 sm:p-6 rounded-lg border border-gray-800 shadow-md">
+              <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
+                <FileText className="mr-2 text-orange-500 flex-shrink-0" size={18} />
                 Poll Details
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="title" className="block text-gray-300 mb-2">
+                  <label htmlFor="title" className="block text-gray-300 mb-2 text-sm font-medium">
                     Title <span className="text-orange-500">*</span>
                   </label>
                   <input
@@ -248,19 +248,19 @@ export default function CreatePoll() {
                     id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full bg-gray-800 border border-gray-700 text-white px-3 py-3 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 text-base"
                     placeholder="Enter poll title"
                   />
                 </div>
                 <div>
-                  <label htmlFor="description" className="block text-gray-300 mb-2">
+                  <label htmlFor="description" className="block text-gray-300 mb-2 text-sm font-medium">
                     Description <span className="text-gray-500">(optional)</span>
                   </label>
                   <textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 h-24"
+                    className="w-full bg-gray-800 border border-gray-700 text-white px-3 py-3 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 h-24 text-base resize-none"
                     placeholder="Enter poll description"
                   />
                 </div>
@@ -268,28 +268,28 @@ export default function CreatePoll() {
             </div>
 
             {/* Questions */}
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-white">
+            <div className="space-y-4">
+              <div className="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
+                <h2 className="text-lg font-semibold text-white">
                   Questions <span className="text-orange-500">*</span>
                 </h2>
                 <button
                   type="button"
                   onClick={addQuestion}
-                  className="flex items-center text-sm bg-gray-800 text-orange-500 px-3 py-1.5 rounded-md hover:bg-gray-700"
+                  className="flex items-center justify-center text-sm bg-gray-800 text-orange-500 px-4 py-3 rounded-md hover:bg-gray-700 active:bg-gray-600 transition-colors w-full sm:w-auto font-medium"
                 >
-                  <Plus size={16} className="mr-1" /> Add Question
+                  <Plus size={16} className="mr-2" /> Add Question
                 </button>
               </div>
 
               {questions.map((question, index) => (
-                <div key={question.id} className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-md">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-white font-medium">Question {index + 1}</h3>
+                <div key={question.id} className="bg-gray-900 p-4 sm:p-6 rounded-lg border border-gray-800 shadow-md">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-white font-medium text-base">Question {index + 1}</h3>
                     <button
                       type="button"
                       onClick={() => removeQuestion(question.id)}
-                      className="text-gray-400 hover:text-red-500"
+                      className="text-gray-400 hover:text-red-500 active:text-red-600 p-2 -m-2 transition-colors"
                       disabled={questions.length === 1}
                     >
                       <Trash2 size={18} />
@@ -299,7 +299,7 @@ export default function CreatePoll() {
                   <div className="space-y-4">
                     {/* Question text */}
                     <div>
-                      <label htmlFor={`question-${question.id}`} className="block text-gray-300 mb-2">
+                      <label htmlFor={`question-${question.id}`} className="block text-gray-300 mb-2 text-sm font-medium">
                         Question Text
                       </label>
                       <input
@@ -307,30 +307,30 @@ export default function CreatePoll() {
                         id={`question-${question.id}`}
                         value={question.questionText}
                         onChange={(e) => updateQuestionText(question.id, e.target.value)}
-                        className="w-full bg-gray-800 border border-gray-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="w-full bg-gray-800 border border-gray-700 text-white px-3 py-3 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 text-base"
                         placeholder="Enter your question"
                       />
                     </div>
 
                     {/* Question type */}
                     <div>
-                      <label className="block text-gray-300 mb-2">
+                      <label className="block text-gray-300 mb-3 text-sm font-medium">
                         Question Type
                       </label>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {questionTypes.map((type) => (
                           <button
                             key={type.value}
                             type="button"
                             onClick={() => updateQuestionType(question.id, type.value)}
-                            className={`flex items-center justify-center p-3 rounded-md border ${
+                            className={`flex items-center justify-start p-4 rounded-md border transition-colors text-left ${
                               question.type === type.value
                                 ? 'bg-orange-600/20 border-orange-500 text-orange-500'
-                                : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
+                                : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 active:bg-gray-600'
                             }`}
                           >
-                            <span className="mr-2">{type.icon}</span>
-                            <span>{type.label}</span>
+                            <span className="mr-3 flex-shrink-0">{type.icon}</span>
+                            <span className="text-sm font-medium">{type.label}</span>
                           </button>
                         ))}
                       </div>
@@ -338,35 +338,37 @@ export default function CreatePoll() {
 
                     {/* Options for choice questions */}
                     {(question.type === 'SINGLE' || question.type === 'MULTIPLE_CHOICE') && (
-                      <div className="space-y-2">
-                        <label className="block text-gray-300 mb-1">
+                      <div className="space-y-3">
+                        <label className="block text-gray-300 mb-2 text-sm font-medium">
                           Options
                         </label>
-                        {question.options.map((option, optionIndex) => (
-                          <div key={optionIndex} className="flex items-center space-x-2">
-                            <input
-                              type="text"
-                              value={option}
-                              onChange={(e) => updateOptionText(question.id, optionIndex, e.target.value)}
-                              className="flex-grow bg-gray-800 border border-gray-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                              placeholder={`Option ${optionIndex + 1}`}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeOption(question.id, optionIndex)}
-                              className="text-gray-400 hover:text-red-500"
-                              disabled={question.options.length <= 2}
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        ))}
+                        <div className="space-y-3">
+                          {question.options.map((option, optionIndex) => (
+                            <div key={optionIndex} className="flex items-center space-x-3">
+                              <input
+                                type="text"
+                                value={option}
+                                onChange={(e) => updateOptionText(question.id, optionIndex, e.target.value)}
+                                className="flex-grow bg-gray-800 border border-gray-700 text-white px-3 py-3 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 text-base"
+                                placeholder={`Option ${optionIndex + 1}`}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeOption(question.id, optionIndex)}
+                                className="text-gray-400 hover:text-red-500 active:text-red-600 p-2 flex-shrink-0 transition-colors"
+                                disabled={question.options.length <= 2}
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                         <button
                           type="button"
                           onClick={() => addOption(question.id)}
-                          className="text-sm text-orange-500 hover:text-orange-400 mt-2 flex items-center"
+                          className="text-sm text-orange-500 hover:text-orange-400 active:text-orange-600 mt-3 flex items-center font-medium transition-colors"
                         >
-                          <Plus size={16} className="mr-1" /> Add Option
+                          <Plus size={16} className="mr-2" /> Add Option
                         </button>
                       </div>
                     )}
@@ -376,12 +378,12 @@ export default function CreatePoll() {
             </div>
 
             {/* Submit button */}
-            <div className="flex justify-end pt-4">
+            <div className="pt-6">
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="flex items-center bg-orange-600 text-white px-6 py-3 rounded-md hover:bg-orange-700 disabled:opacity-50"
+                className="flex items-center justify-center bg-orange-600 text-white px-6 py-4 rounded-md hover:bg-orange-700 active:bg-orange-800 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto sm:ml-auto font-medium text-base transition-colors"
               >
                 {isSubmitting ? (
                   <span>Creating Poll...</span>
@@ -398,18 +400,18 @@ export default function CreatePoll() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-black py-6 border-t border-orange-600/30">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-center md:text-left mb-4 md:mb-0">
-              <p className="text-gray-400 text-sm">
+      <footer className="bg-black py-4 sm:py-6 border-t border-orange-600/30">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex flex-col items-center space-y-3 sm:flex-row sm:justify-between sm:space-y-0">
+            <div className="text-center sm:text-left">
+              <p className="text-gray-400 text-xs sm:text-sm">
                 © 2025 TrueFeedback. All rights reserved.
               </p>
             </div>
-            <div className="flex space-x-6">
-              <a href="#" className="text-gray-400 hover:text-orange-500 text-sm">Terms</a>
-              <a href="#" className="text-gray-400 hover:text-orange-500 text-sm">Privacy</a>
-              <a href="#" className="text-gray-400 hover:text-orange-500 text-sm">Support</a>
+            <div className="flex space-x-4 sm:space-x-6">
+              <a href="#" className="text-gray-400 hover:text-orange-500 active:text-orange-600 text-xs sm:text-sm transition-colors">Terms</a>
+              <a href="#" className="text-gray-400 hover:text-orange-500 active:text-orange-600 text-xs sm:text-sm transition-colors">Privacy</a>
+              <a href="#" className="text-gray-400 hover:text-orange-500 active:text-orange-600 text-xs sm:text-sm transition-colors">Support</a>
             </div>
           </div>
         </div>
