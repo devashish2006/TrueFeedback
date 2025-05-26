@@ -10,34 +10,40 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
+    // Connect to the database
     await dbConnect();
 
     // Retrieve session using NextAuth
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.username) {
+    // Check if user is logged in and has username
+    if (!session || !session.user || !session.user.username) {
       return NextResponse.json(
-        { organization: false },
+        { isOrganizationMember: false, message: "User not authenticated or missing username" },
         { status: 200 }
       );
     }
 
     const username = session.user.username;
 
-    // Case-insensitive search for organization
+    // Find organization with matching username (case-insensitive)
     const organization = await OrganizationModel.findOne({
       username: { $regex: new RegExp(`^${username}$`, 'i') }
     }).lean().exec();
 
+    // Return whether organization exists for this user
     return NextResponse.json(
-      { organization: !!organization },
+      { 
+        isOrganizationMember: !!organization,
+        message: organization ? "User belongs to an organization" : "User does not belong to any organization"
+      },
       { status: 200 }
     );
 
   } catch (error) {
-    console.error("Error checking organization existence:", error);
+    console.error("Error checking organization membership:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to check organization membership", details: (error as Error).message },
       { status: 500 }
     );
   }

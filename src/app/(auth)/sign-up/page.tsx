@@ -22,7 +22,7 @@ import { useRouter } from 'next/navigation';
 import { signUpSchema } from "@/schemas/signUpSchema";
 import axios, { AxiosError } from 'axios';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, BarChart3 } from "lucide-react";
 import { motion } from 'framer-motion';
 
 export default function SignUpForm() {
@@ -43,7 +43,10 @@ export default function SignUpForm() {
             email: '',
             password: '',
         },
+        mode: 'onChange',
     });
+
+    const isValid = form.formState.isValid;
 
     useEffect(() => {
         const checkUsernameUnique = async () => {
@@ -94,29 +97,45 @@ export default function SignUpForm() {
     };
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-900">
+        <div className="flex justify-center items-center min-h-screen bg-black">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-lg shadow-lg border border-gray-700"
+                className="w-full max-w-md p-8 space-y-8 bg-gray-900 rounded-lg shadow-xl border border-gray-800"
             >
                 <div className="text-center">
+                    {/* TrueFeedback Branding */}
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="flex items-center justify-center mb-6"
+                    >
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 mr-3 flex items-center justify-center">
+                            <BarChart3 size={16} className="text-white" />
+                        </div>
+                        <span className="text-3xl font-bold">
+                            <span className="text-orange-500">True</span>
+                            <span className="text-white">Feedback</span>
+                        </span>
+                    </motion.div>
+                    
                     <motion.h1
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
-                        className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500"
+                        className="text-3xl font-bold tracking-tight mb-4 text-white"
                     >
-                        Join True Feedback
+                        Create Account
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.4 }}
-                        className="mb-4 text-gray-300"
+                        className="mb-6 text-gray-400"
                     >
-                        Sign up to start your anonymous adventure
+                        Sign up to start your journey
                     </motion.p>
                 </div>
                 <Form {...form}>
@@ -126,7 +145,7 @@ export default function SignUpForm() {
                             control={form.control}
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-300">Username</FormLabel>
+                                    <FormLabel className="text-gray-300 font-medium">Username</FormLabel>
                                     <div className="relative">
                                         <Input
                                             {...field}
@@ -134,20 +153,20 @@ export default function SignUpForm() {
                                                 field.onChange(e);
                                                 setUsername(e.target.value);
                                             }}
-                                            className="bg-gray-700 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500"
+                                            className="bg-gray-800 text-white border-gray-700 focus:border-orange-500 focus:ring-orange-500/20 transition-all duration-200 h-12 rounded-lg pr-10"
                                         />
                                         {isCheckingUsername && (
                                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                                <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                                                <Loader2 className="h-4 w-4 animate-spin text-orange-500" />
                                             </div>
                                         )}
                                     </div>
                                     {!isCheckingUsername && usernameMessage && (
-                                        <p className={`text-sm mt-1 ${isUsernameUnique ? 'text-green-500' : 'text-red-500'}`}>
+                                        <p className={`text-sm mt-1 ${isUsernameUnique ? 'text-green-400' : 'text-red-400'}`}>
                                             {usernameMessage}
                                         </p>
                                     )}
-                                    <FormMessage />
+                                    <FormMessage className="text-orange-400" />
                                 </FormItem>
                             )}
                         />
@@ -156,15 +175,15 @@ export default function SignUpForm() {
                             control={form.control}
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-300">Email</FormLabel>
+                                    <FormLabel className="text-gray-300 font-medium">Email</FormLabel>
                                     <Input
                                         {...field}
-                                        className="bg-gray-700 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500"
+                                        className="bg-gray-800 text-white border-gray-700 focus:border-orange-500 focus:ring-orange-500/20 transition-all duration-200 h-12 rounded-lg"
                                     />
-                                    <p className="text-sm text-gray-400">
-                                        We will send you a verification code
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        We'll send you a verification code
                                     </p>
-                                    <FormMessage />
+                                    <FormMessage className="text-orange-400" />
                                 </FormItem>
                             )}
                         />
@@ -173,13 +192,13 @@ export default function SignUpForm() {
                             control={form.control}
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-300">Password</FormLabel>
+                                    <FormLabel className="text-gray-300 font-medium">Password</FormLabel>
                                     <Input
                                         type="password"
                                         {...field}
-                                        className="bg-gray-700 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500"
+                                        className="bg-gray-800 text-white border-gray-700 focus:border-orange-500 focus:ring-orange-500/20 transition-all duration-200 h-12 rounded-lg"
                                     />
-                                    <FormMessage />
+                                    <FormMessage className="text-orange-400" />
                                 </FormItem>
                             )}
                         />
@@ -190,16 +209,20 @@ export default function SignUpForm() {
                         >
                             <Button
                                 type="submit"
-                                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all hover:scale-105 transform"
-                                disabled={isSubmitting}
+                                className={`w-full h-12 font-semibold rounded-lg transition-all duration-200 ${
+                                  !isValid || isSubmitting
+                                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                                    : "bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-orange-500/25 hover:scale-[1.02] transform"
+                                }`}
+                                disabled={!isValid || isSubmitting}
                             >
                                 {isSubmitting ? (
-                                    <>
+                                    <span className="flex items-center justify-center">
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Please wait
-                                    </>
+                                        Creating Account...
+                                    </span>
                                 ) : (
-                                    'Sign Up'
+                                    'Create Account'
                                 )}
                             </Button>
                         </motion.div>
@@ -209,15 +232,33 @@ export default function SignUpForm() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.8 }}
-                    className="text-center mt-4"
+                    className="text-center mt-6"
                 >
-                    <p className="text-gray-300">
-                        Already a member?{' '}
+                    <p className="text-gray-400">
+                        Already have an account?{' '}
                         <Link
                             href="/sign-in"
-                            className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                            className="text-orange-500 hover:text-orange-400 transition-colors duration-200 font-medium"
                         >
                             Sign in
+                        </Link>
+                    </p>
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 1 }}
+                    className="pt-6 text-xs text-center text-gray-500 border-t border-gray-800 mt-6"
+                >
+                    <p>
+                        By creating an account, you agree to our
+                        <br />
+                        <Link href="/terms" className="text-orange-500 hover:text-orange-400 transition-colors duration-200">
+                            Terms of Service
+                        </Link>{' '}
+                        and{' '}
+                        <Link href="/privacy" className="text-orange-500 hover:text-orange-400 transition-colors duration-200">
+                            Privacy Policy
                         </Link>
                     </p>
                 </motion.div>

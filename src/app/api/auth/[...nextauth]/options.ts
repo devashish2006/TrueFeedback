@@ -58,27 +58,26 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         async jwt({ token, user }) {
-            console.log("JWT callback - Token before modification:", token); // Debug token
-            if (user) {
-                token._id = user._id?.toString();
-                token.isVerified = user.isVerified;
-                token.isAcceptingMessage = user.isAcceptingMessages;
-                token.username = user.username;
-                console.log("JWT callback - Token after modification:", token); // Log updated token
-            }
-            return token;
+          if (user) {
+            token._id = user._id?.toString();
+            token.isVerified = user.isVerified;
+            token.isAcceptingMessage = user.isAcceptingMessages;
+            token.username = user.username;
+          }
+          return token;
         },
         async session({ session, token }) {
-            console.log("Session callback - Session before modification:", session); // Debug session
-            console.log("Session callback - Token:", token); // Debug token data
-            if (token) {
-                session.user._id = token._id as string | undefined; // Explicitly cast _id to string or undefined
-                session.user.isVerified = token.isVerified as boolean; // Cast isVerified as boolean
-                session.user.isAcceptingMessages = token.isAcceptingMessages as boolean | undefined; // Cast isAcceptingMessages as boolean or undefined
-                session.user.username = token.username as string | undefined; // Cast username as string or undefined
-            }
-            console.log("Session callback - Session after modification:", session); // Log updated session
-            return session;
+          if (token) {
+            session.user._id = token._id as string | undefined;
+            session.user.isVerified = token.isVerified as boolean;
+            session.user.isAcceptingMessages = token.isAcceptingMessages as boolean | undefined;
+            session.user.username = token.username as string | undefined;
+          }
+          return session;
+        },
+        redirect({ url, baseUrl }) {
+          return '/ask'; // <--- 👈 This line ensures the user is redirected to /ask after login
         }
-    }
+      }
+      
 };
