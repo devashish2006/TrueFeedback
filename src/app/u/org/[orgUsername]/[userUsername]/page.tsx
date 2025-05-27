@@ -71,61 +71,41 @@ const SendMessageOrg = () => {
   });
 
   const fetchOrgDetails = useCallback(async () => {
-    if (!orgUsername) {
-      setError('Organization username is missing');
-      setLoading(false);
-      return;
-    }
+  if (!orgUsername) {
+    setError('Organization username is missing');
+    setLoading(false);
+    return;
+  }
 
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Try multiple possible API endpoints for fetching organization data
-      let response;
-      try {
-        // First try with query parameter
-        response = await axios.get(`/api/publicOrganisationDetails?orgUsername=${orgUsername}`);
-      } catch (err) {
-        // If that fails, try with path parameter
-        try {
-          response = await axios.get(`/api/publicOrganisationDetails/${orgUsername}`);
-        } catch (err2) {
-          // Try alternative endpoint naming
-          try {
-            response = await axios.get(`/api/organization/public/${orgUsername}`);
-          } catch (err3) {
-            // Try yet another common pattern
-            response = await axios.get(`/api/org/public?username=${orgUsername}`);
-          }
-        }
-      }
+  try {
+    setLoading(true);
+    setError(null);
+    
+    // Fetch organization data using the correct API endpoint
+    const response = await axios.get(`/api/publicOrganisationDetails?orgUsername=${userUsername}`);
 
-      if (response?.data?.organization) {
-        setOrg(response.data.organization);
-      } else if (response?.data) {
-        // Handle case where organization data is directly in response
-        setOrg(response.data);
-      } else {
-        throw new Error('Invalid response format');
-      }
-    } catch (err) {
-      console.error('Error fetching organization details:', err);
-      const axiosError = err as AxiosError<{ message: string }>;
-      const errorMessage = axiosError.response?.data?.message || 
-                          axiosError.message || 
-                          'Failed to load organization details. Please check if the organization exists.';
-      setError(errorMessage);
-      
-      toast({
-        title: 'Error Loading Organization',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
+    if (response?.data?.organization) {
+      setOrg(response.data.organization);
+    } else {
+      throw new Error('Invalid response format');
     }
-  }, [orgUsername, toast]);
+  } catch (err) {
+    console.error('Error fetching organization details:', err);
+    const axiosError = err as AxiosError<{ message: string }>;
+    const errorMessage = axiosError.response?.data?.message || 
+                        axiosError.message || 
+                        'Failed to load organization details. Please check if the organization exists.';
+    setError(errorMessage);
+    
+    toast({
+      title: 'Error Loading Organization',
+      description: errorMessage,
+      variant: 'destructive',
+    });
+  } finally {
+    setLoading(false);
+  }
+}, [orgUsername, toast]);
 
   useEffect(() => {
     fetchOrgDetails();

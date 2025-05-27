@@ -3,7 +3,7 @@ import { getToken } from 'next-auth/jwt';
 export { default } from 'next-auth/middleware';
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/sign-in', '/sign-up', '/', '/verify/:path*', '/ask', '/organisationDashboard', '/organisationDetails', '/fastForward', '/MyPolls', '/thankyou'],
+  matcher: ['/dashboard/:path*', '/sign-in', '/sign-up', '/', '/verify/:path*', '/ask', '/organisationDashboard', '/organisationDetails', '/fastForward', '/MyPolls'],
 };
 
 export async function middleware(request: NextRequest) {
@@ -31,7 +31,6 @@ export async function middleware(request: NextRequest) {
       url.pathname.startsWith('/ask') ||
       url.pathname.startsWith('/organisationDashboard') ||
       url.pathname.startsWith('/organisationDetails') ||
-      url.pathname.startsWith('/thankyou') ||
       url.pathname.startsWith('/MyPolls') ||
       url.pathname.startsWith('/fastForward')  
 

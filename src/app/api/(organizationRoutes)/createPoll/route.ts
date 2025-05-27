@@ -109,8 +109,12 @@ export async function POST(request: NextRequest) {
       slug,
     });
 
-    // Return poll URL for the success message
-    const pollUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}/polls/${slug}`;
+    // Get organization username (name field) and user username from session
+    const orgUsername = org.name; // Organization username from the model
+    const userUsername = username; // User username from session
+
+    // Construct the poll URL with the new format
+    const pollUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://trufeedback.xyz'}/u/org/${orgUsername}/${userUsername}/${slug}`;
 
     return NextResponse.json(
       { 

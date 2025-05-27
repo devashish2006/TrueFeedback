@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
       await mongoose.connect(process.env.MONGODB_URI as string);
     }
 
-    // Extract the orgUsername from query parameters: ?orgUsername=Debug
+    // Extract orgUsername from query parameters
     const { searchParams } = new URL(req.url);
     const orgUsername = searchParams.get("orgUsername");
 
@@ -24,10 +24,27 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Fetch organization details from MongoDB
-    const organization = await OrganizationModel.findOne({ name: orgUsername });
+    // Decode the URL-encoded username
+    const decodedOrgUsername = decodeURIComponent(orgUsername);
+
+    // Find organization by username field first (primary search)
+    let organization = await OrganizationModel.findOne({ 
+      username: decodedOrgUsername 
+    });
+
+    // If not found by username, try searching by name as fallback
+    // This handles cases where orgUsername might actually be the organization name
     if (!organization) {
-      return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+      organization = await OrganizationModel.findOne({ 
+        name: decodedOrgUsername 
+      });
+    }
+
+    if (!organization) {
+      return NextResponse.json({ 
+        error: "Organization not found",
+        details: `No organization found with username or name: ${decodedOrgUsername}`
+      }, { status: 404 });
     }
 
     return NextResponse.json({ organization }, { status: 200 });

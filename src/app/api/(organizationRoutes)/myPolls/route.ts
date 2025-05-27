@@ -1,9 +1,10 @@
 import { getServerSession } from "next-auth/next";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import PollFormModel from "@/model/pollFormModel";
 import OrganizationModel from "@/model/organisation";
 import dbConnect from '@/lib/dbConnect';
+import { Types } from 'mongoose';
 
 export async function GET(request: Request) {
   await dbConnect();
@@ -26,25 +27,23 @@ export async function GET(request: Request) {
 
     // Find polls created by this user's organization
     const polls = await PollFormModel.find({
-      createdBy: organization._id,  // Changed from session.user.id to organization._id
+      createdBy: organization._id,
       organization: organization._id
     })
-      .populate("organization", "name username")  // Only populate specific fields
+      .populate("organization", "name username")
       .lean();
 
     const pollsWithUrls = polls.map((poll) => {
       // Process responses for better frontend consumption
       const processedResponses = poll.responses.map((response, index) => ({
-        id: index + 1, // Since responses don't have _id, use index-based ID
+        id: index + 1,
         submittedAt: response.submittedAt,
         answers: response.answers.map(answer => {
-          // Find the corresponding question to provide context
           const question = poll.questions.find(q => q._id?.toString() === answer.questionId.toString());
           return {
             questionId: answer.questionId,
             questionText: question?.questionText || 'Question not found',
             questionType: question?.type || 'unknown',
-            // Include all possible answer types
             selectedOptions: answer.selectedOptions || [],
             agreement: answer.agreement,
             rating: answer.rating
@@ -55,13 +54,12 @@ export async function GET(request: Request) {
       // Calculate response analytics
       const responseAnalytics = {
         totalResponses: poll.responses.length,
-        averageCompletionTime: null, // Could be calculated if you track start/end times
+        averageCompletionTime: null,
         responsesByDate: poll.responses.reduce((acc, response) => {
           const date = response.submittedAt.toISOString().split('T')[0];
           acc[date] = (acc[date] || 0) + 1;
           return acc;
         }, {}),
-        // Question-level analytics
         questionAnalytics: poll.questions.map(question => {
           const questionResponses = poll.responses.flatMap(response => 
             response.answers.filter(answer => 
@@ -76,7 +74,6 @@ export async function GET(request: Request) {
             totalResponses: questionResponses.length
           };
 
-          // Add type-specific analytics
           switch (question.type) {
             case 'single':
             case 'multiple':
@@ -119,18 +116,31 @@ export async function GET(request: Request) {
       return {
         ...poll,
         slug: poll.slug,
-        url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/u/org/${session.user.username}/${poll.organization.name}/${poll.slug}`,
+        url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/u/org/${organization.name}/${session.user.username}/${poll.slug}`,
         status: poll.responses.length > 0 ? 'active' : 'inactive',
         responsesCount: poll.responses.length,
         createdAt: poll.createdAt,
         questionsCount: poll.questions.length,
-        // Enhanced response data
         responses: processedResponses,
-        analytics: responseAnalytics
+        analytics: responseAnalytics,
+        // Explicitly include organization details for frontend
+        organizationInfo: {
+          id: organization._id,
+          name: organization.name,
+          username: organization.username
+        }
       };
     });
 
-    return NextResponse.json(pollsWithUrls);
+    // Return polls with organization information
+    return NextResponse.json({
+      polls: pollsWithUrls,
+      organization: {
+        id: organization._id,
+        name: organization.name,
+        username: organization.username
+      }
+    });
   } catch (error) {
     console.error("Error fetching polls:", error);
     return NextResponse.json(
@@ -140,7 +150,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   await dbConnect();
 
   const session = await getServerSession(authOptions);
@@ -150,12 +160,23 @@ export async function DELETE(request: Request) {
   }
 
   try {
+    // Get pollId from query parameters
     const { searchParams } = new URL(request.url);
     const pollId = searchParams.get('pollId');
 
+    console.log("DELETE request received for pollId:", pollId);
+
     if (!pollId) {
       return NextResponse.json(
-        { error: "Poll ID is required" },
+        { error: "Poll ID is required as query parameter (?pollId=...)" },
+        { status: 400 }
+      );
+    }
+
+    // Validate ObjectId format
+    if (!Types.ObjectId.isValid(pollId)) {
+      return NextResponse.json(
+        { error: "Invalid Poll ID format" },
         { status: 400 }
       );
     }
@@ -169,33 +190,80 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Organization not found" }, { status: 404 });
     }
 
-    // Verify the poll belongs to the user's organization
-    const poll = await PollFormModel.findOne({
-      _id: pollId,
-      createdBy: organization._id,  // Changed from session.user.id
-      organization: organization._id
-    });
+    console.log("Organization found:", organization.name, "ID:", organization._id);
+
+    // Find the poll first to verify ownership
+    const poll = await PollFormModel.findById(pollId);
 
     if (!poll) {
+      console.log("Poll not found with ID:", pollId);
       return NextResponse.json(
-        { error: "Poll not found or unauthorized" },
+        { error: "Poll not found" },
         { status: 404 }
       );
     }
 
-    await PollFormModel.deleteOne({ _id: pollId });
+    console.log("Poll found:", poll.title);
+    console.log("Poll createdBy:", poll.createdBy);
+    console.log("Poll organization:", poll.organization);
+    console.log("User organization:", organization._id);
+
+    // Check if poll belongs to user's organization
+    const pollCreatedBy = poll.createdBy?.toString();
+    const pollOrganization = poll.organization?.toString();
+    const userOrgId = organization._id.toString();
+
+    if (pollCreatedBy !== userOrgId && pollOrganization !== userOrgId) {
+      console.log("Unauthorized access attempt");
+      console.log("Poll createdBy:", pollCreatedBy);
+      console.log("Poll organization:", pollOrganization);
+      console.log("User organization:", userOrgId);
+      
+      return NextResponse.json(
+        { error: "Unauthorized - Poll does not belong to your organization" },
+        { status: 403 }
+      );
+    }
+
+    console.log("Authorization check passed, proceeding with deletion");
+
+    // Delete the poll
+    const deleteResult = await PollFormModel.findByIdAndDelete(pollId);
+    
+    if (!deleteResult) {
+      console.log("Failed to delete poll - poll may have been already deleted");
+      return NextResponse.json(
+        { error: "Failed to delete poll - it may have been already deleted" },
+        { status: 404 }
+      );
+    }
+
+    console.log("Poll deleted successfully:", deleteResult.title);
+
     return NextResponse.json({ 
+      success: true,
       message: "Poll deleted successfully",
       deletedPoll: {
-        id: poll._id,
-        slug: poll.slug,
-        title: poll.title
+        id: deleteResult._id,
+        slug: deleteResult.slug,
+        title: deleteResult.title
+      },
+      organization: {
+        id: organization._id,
+        name: organization.name,
+        username: organization.username
       }
     });
+
   } catch (error) {
     console.error("Error deleting poll:", error);
+    console.error("Error stack:", error.stack);
+    
     return NextResponse.json(
-      { error: "Internal server error" },
+      { 
+        error: "Internal server error",
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      },
       { status: 500 }
     );
   }

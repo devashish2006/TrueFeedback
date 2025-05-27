@@ -9,13 +9,14 @@ import { Message } from '@/model/User';
 import { ApiResponse } from '../../../../types/ApiResponse';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
-import { Loader2, RefreshCcw, LogOut, Copy, Bell, BarChart3, MessageSquare, Users, TrendingUp } from 'lucide-react';
+import { Loader2, RefreshCcw, LogOut, Copy, Bell, BarChart3, MessageSquare, Users, TrendingUp, Zap } from 'lucide-react';
 import { User } from 'next-auth';
 import { signOut, useSession } from 'next-auth/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AcceptMessageSchema } from '@/schemas/acceptMessageSchema';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 function UserDashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -23,6 +24,7 @@ function UserDashboard() {
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
 
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleDeleteMessage = (messageId: string) => {
     setMessages(messages.filter((message) => message._id !== messageId));
@@ -116,6 +118,10 @@ function UserDashboard() {
     }
   };
 
+  const handleFastForwardPolls = () => {
+    router.push('/ask');
+  };
+
   if (!session || !session.user) {
     return <div></div>;
   }
@@ -156,15 +162,25 @@ function UserDashboard() {
             <span className="text-white">Feedback</span>
           </h1>
         </div>
-        <Button
-          onClick={handleLogout}
-          variant="ghost"
-          className="bg-white/5 hover:bg-white/10 text-white font-medium flex items-center px-3 sm:px-6 py-2 rounded-xl transition-all duration-300 border border-white/10 hover:border-orange-500/30 text-sm sm:text-base"
-        >
-          <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> 
-          <span className="hidden sm:inline">Logout</span>
-          <span className="sm:hidden">Exit</span>
-        </Button>
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Button
+            onClick={handleFastForwardPolls}
+            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium flex items-center px-4 sm:px-6 py-2 rounded-xl transition-all duration-300 text-sm sm:text-base"
+          >
+            <Zap className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">FastForwardPolls</span>
+            <span className="sm:hidden">Polls</span>
+          </Button>
+          <Button
+            onClick={handleLogout}
+            variant="ghost"
+            className="bg-white/5 hover:bg-white/10 text-white font-medium flex items-center px-3 sm:px-6 py-2 rounded-xl transition-all duration-300 border border-white/10 hover:border-orange-500/30 text-sm sm:text-base"
+          >
+            <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> 
+            <span className="hidden sm:inline">Logout</span>
+            <span className="sm:hidden">Exit</span>
+          </Button>
+        </div>
       </motion.nav>
 
       {/* Main Content */}

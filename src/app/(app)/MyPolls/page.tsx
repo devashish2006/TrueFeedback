@@ -60,105 +60,7 @@ interface Poll {
 
 
 
-// Mock data for demonstration
-const mockPolls: Poll[] = [
-  {
-    _id: '1',
-    title: 'Customer Satisfaction Survey 2024',
-    organization: { _id: 'org1', name: 'Tech Corp' },
-    createdAt: '2024-01-15T10:00:00Z',
-    responsesCount: 245,
-    status: 'active',
-    url: 'https://truefeedback.com/poll/customer-satisfaction-2024',
-    slug: 'customer-satisfaction-2024',
-    responses: [
-      {
-        id: 1,
-        submittedAt: '2024-01-20T14:30:00Z',
-        answers: [
-          {
-            questionId: 'q1',
-            questionText: 'How satisfied are you with our service?',
-            questionType: 'rating',
-            rating: 4
-          },
-          {
-            questionId: 'q2',
-            questionText: 'Which features do you use most?',
-            questionType: 'multiple',
-            selectedOptions: ['Dashboard', 'Analytics']
-          }
-        ]
-      },
-      {
-        id: 2,
-        submittedAt: '2024-01-21T09:15:00Z',
-        answers: [
-          {
-            questionId: 'q1',
-            questionText: 'How satisfied are you with our service?',
-            questionType: 'rating',
-            rating: 5
-          },
-          {
-            questionId: 'q2',
-            questionText: 'Which features do you use most?',
-            questionType: 'multiple',
-            selectedOptions: ['Reports', 'Analytics']
-          }
-        ]
-      }
-    ],
-    analytics: {
-      totalResponses: 245,
-      responsesByDate: {
-        '2024-01-15': 12,
-        '2024-01-16': 23,
-        '2024-01-17': 31,
-        '2024-01-18': 18,
-        '2024-01-19': 25,
-        '2024-01-20': 34,
-        '2024-01-21': 28,
-        '2024-01-22': 42,
-        '2024-01-23': 32
-      },
-      questionAnalytics: [
-        {
-          questionId: 'q1',
-          questionText: 'How satisfied are you with our service?',
-          type: 'rating',
-          totalResponses: 245,
-          ratingStats: {
-            average: 4.2,
-            min: 1,
-            max: 5,
-            distribution: { '1': 8, '2': 15, '3': 42, '4': 98, '5': 82 }
-          }
-        },
-        {
-          questionId: 'q2',
-          questionText: 'Which features do you use most?',
-          type: 'multiple',
-          totalResponses: 245,
-          optionCounts: {
-            'Dashboard': 156,
-            'Analytics': 134,
-            'Reports': 98,
-            'Settings': 67,
-            'API': 34
-          }
-        },
-        {
-          questionId: 'q3',
-          questionText: 'Would you recommend our service?',
-          type: 'agree',
-          totalResponses: 245,
-          agreementCounts: { agree: 201, disagree: 44 }
-        }
-      ]
-    }
-  }
-];
+
 
 
 
@@ -174,6 +76,8 @@ export default function PollDashboard() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [exportLoading, setExportLoading] = useState(false);
+  const [organization, setOrganization] = useState(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   useEffect(() => {
     if (session) {
@@ -195,48 +99,519 @@ export default function PollDashboard() {
   const router = useRouter();
 
   const fetchPolls = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('/api/myPolls');
-      if (!response.ok) {
-        throw new Error('Failed to fetch polls');
-      }
-      const data = await response.json();
-      setPolls(data);
-    } catch (error) {
-      console.error('Error fetching polls:', error);
-      setError('Failed to load polls. Please try again.');
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  setError(null);
+  try {
+    const response = await fetch('/api/myPolls');
+    if (!response.ok) {
+      throw new Error('Failed to fetch polls');
     }
-  };
+    const data = await response.json();
+    setPolls(data.polls || []);
+    setOrganization(data.organization);
+  } catch (error) {
+    console.error('Error fetching polls:', error);
+    setError('Failed to load polls. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const handleDeletePoll = async () => {
-    if (!deleteId) return;
+// Replace the exportToPDF function with these improvements:
+
+const exportToPDF = async (poll: Poll) => {
+  setPdfLoading(true);
+  
+  try {
+    // Dynamic import to reduce bundle size
+    const { jsPDF } = await import('jspdf');
+    const { default: html2canvas } = await import('html2canvas');
+    const { default: Chart } = await import('chart.js/auto');
     
-    try {
-      const response = await fetch(`/api/polls?pollId=${deleteId}`, {
-        method: 'DELETE'
+    // Initialize PDF with proper settings for better font rendering
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+      compress: true,
+      precision: 2
+    });
+
+    // Set high-quality font rendering
+    pdf.setFont('helvetica');
+    pdf.setFontSize(12);
+    pdf.setTextColor(40, 40, 40); // Darker text for better readability
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 20;
+    let currentY = margin;
+    
+    // Helper function to add diagonal watermark on any page
+    const addDiagonalWatermark = () => {
+      pdf.saveGraphicsState();
+      pdf.setGState(pdf.GState({ opacity: 0.1 })); // Very light opacity
+      pdf.setTextColor(150, 150, 150);
+      pdf.setFontSize(28);
+      pdf.setFont('helvetica', 'bold');
+      
+      // Calculate center position for diagonal text
+      const centerX = pageWidth / 2;
+      const centerY = pageHeight / 2;
+      
+      // Add diagonal watermark text
+      pdf.text('SYSTEM GENERATED', centerX, centerY, {
+        angle: 45,
+        align: 'center'
       });
       
-      if (!response.ok) {
-        throw new Error('Failed to delete poll');
+      pdf.restoreGraphicsState();
+    };
+    
+    // Helper function to add new page if needed
+    const checkPageBreak = (height: number) => {
+      if (currentY + height > pageHeight - margin) {
+        pdf.addPage();
+        addDiagonalWatermark(); // Add watermark to new page
+        currentY = margin;
+        return true;
       }
+      return false;
+    };
+    
+    // Improved header function with better typography
+    const addHeader = () => {
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(28);
+      pdf.setTextColor(247, 115, 22); // Orange
+      pdf.text('True', margin, currentY);
       
+      pdf.setTextColor(40, 40, 40); // Dark gray for better contrast
+      pdf.text('Feedback', margin + 25, currentY);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(11);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('Professional Poll Analytics Report', margin, currentY + 8);
+      
+      // Clean line separator
+      pdf.setDrawColor(200, 200, 200);
+      pdf.setLineWidth(0.5);
+      pdf.line(margin, currentY + 12, pageWidth - margin, currentY + 12);
+      
+      currentY += 20;
+    };
+    
+    // Improved footer function
+    const addFooter = (pageNum: number, totalPages: number) => {
+      const footerY = pageHeight - 15;
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(9);
+      pdf.setTextColor(120, 120, 120);
+      
+      // Left side - generation date
+      pdf.text(`Generated: ${new Date().toLocaleDateString('en-US')}`, margin, footerY);
+      
+      // Center - organization info
+      pdf.text('TrueFeedback Analytics System', pageWidth / 2, footerY, { align: 'center' });
+      
+      // Right side - page numbers with better formatting
+      pdf.text(`${pageNum} / ${totalPages}`, pageWidth - margin, footerY, { align: 'right' });
+    };
+    
+    // Add first page header and watermark
+    addHeader();
+    addDiagonalWatermark();
+    
+    // Improved poll title with better typography
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(22);
+    pdf.setTextColor(40, 40, 40);
+    const titleLines = pdf.splitTextToSize(poll.title, pageWidth - margin * 2);
+    pdf.text(titleLines, margin, currentY);
+    currentY += titleLines.length * 8 + 15;
+    
+    // Enhanced metadata box with cleaner design
+    pdf.setFillColor(248, 249, 250);
+    pdf.setDrawColor(220, 220, 220);
+    pdf.setLineWidth(0.5);
+    pdf.roundedRect(margin, currentY, pageWidth - margin * 2, 40, 2, 2, 'FD');
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+    pdf.setTextColor(80, 80, 80);
+    
+    const metadataY = currentY + 8;
+    pdf.text(`Organization: ${poll.organization.name}`, margin + 8, metadataY);
+    pdf.text(`Created: ${new Date(poll.createdAt).toLocaleDateString('en-US')}`, margin + 8, metadataY + 6);
+    pdf.text(`Status: ${poll.status.toUpperCase()}`, margin + 8, metadataY + 12);
+    pdf.text(`Total Responses: ${poll.responsesCount}`, margin + 8, metadataY + 18);
+    pdf.text(`Poll URL: ${poll.url || 'N/A'}`, margin + 8, metadataY + 24);
+    pdf.text(`Report ID: ${Date.now()}`, margin + 8, metadataY + 30);
+    
+    currentY += 50;
+    
+    // Improved section headers
+    const addSectionHeader = (title: string) => {
+      checkPageBreak(25);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(16);
+      pdf.setTextColor(247, 115, 22); // Orange theme color
+      pdf.text(title, margin, currentY);
+      currentY += 12;
+    };
+    
+    // Executive Summary with better formatting
+    addSectionHeader('Executive Summary');
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(11);
+    pdf.setTextColor(60, 60, 60);
+    
+    const summaryText = [
+      `This comprehensive report analyzes the "${poll.title}" survey responses.`,
+      `Data collected: ${poll.responsesCount} total responses across ${poll.analytics?.questionAnalytics?.length || 0} questions.`,
+      `Collection period: ${new Date(poll.createdAt).toLocaleDateString('en-US')} to ${new Date().toLocaleDateString('en-US')}`,
+      `Current status: ${poll.status.toUpperCase()}`,
+      `Report generated: ${new Date().toLocaleString('en-US')}`,
+      ''
+    ];
+    
+    summaryText.forEach(line => {
+      if (line) {
+        checkPageBreak(8);
+        const splitText = pdf.splitTextToSize(line, pageWidth - margin * 2);
+        pdf.text(splitText, margin, currentY);
+        currentY += splitText.length * 6;
+      } else {
+        currentY += 6;
+      }
+    });
+    
+    // Enhanced chart creation with better fonts
+    const createChart = async (type: string, data: any, options = {}) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1000; // Higher resolution
+      canvas.height = 500;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) throw new Error('Could not get canvas context');
+      
+      const chart = new Chart(ctx, {
+        type,
+        data,
+        options: {
+          responsive: false,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { 
+              display: type === 'pie',
+              position: 'bottom',
+              labels: {
+                font: {
+                  family: 'Arial',
+                  size: 14,
+                  weight: 'normal'
+                },
+                color: '#333333',
+                padding: 15
+              }
+            },
+            title: { 
+              display: true,
+              text: data.datasets[0].label || '',
+              font: {
+                family: 'Arial',
+                size: 16,
+                weight: 'bold'
+              },
+              color: '#333333',
+              padding: 20
+            }
+          },
+          scales: type !== 'pie' ? {
+            y: { 
+              beginAtZero: true,
+              ticks: {
+                font: {
+                  family: 'Arial',
+                  size: 12
+                },
+                color: '#666666'
+              },
+              grid: {
+                color: '#e0e0e0'
+              }
+            },
+            x: { 
+              display: true,
+              ticks: {
+                font: {
+                  family: 'Arial',
+                  size: 12
+                },
+                color: '#666666'
+              },
+              grid: {
+                color: '#e0e0e0'
+              }
+            }
+          } : {},
+          ...options
+        }
+      });
+      
+      return new Promise<string>((resolve) => {
+        setTimeout(() => {
+          const imageData = canvas.toDataURL('image/png', 0.9);
+          chart.destroy();
+          resolve(imageData);
+        }, 400);
+      });
+    };
+
+    // Response Timeline Chart with improved styling
+    if (poll.analytics?.responsesByDate && Object.keys(poll.analytics.responsesByDate).length > 0) {
+      addSectionHeader('Response Timeline Analysis');
+      
+      const timelineData = Object.entries(poll.analytics.responsesByDate)
+        .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime());
+      
+      const chartData = {
+        labels: timelineData.map(([date]) => new Date(date).toLocaleDateString('en-US')),
+        datasets: [{
+          label: 'Daily Response Count',
+          data: timelineData.map(([, count]) => count),
+          borderColor: '#f97316',
+          backgroundColor: '#f9731640',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2
+        }]
+      };
+      
+      checkPageBreak(90);
+      const chartImage = await createChart('line', chartData);
+      pdf.addImage(chartImage, 'PNG', margin, currentY, pageWidth - margin * 2, 75);
+      currentY += 85;
+      
+      // Timeline statistics with better formatting
+      const totalDays = timelineData.length;
+      const avgDaily = Math.round(poll.responsesCount / totalDays);
+      const peakDay = timelineData.reduce((max, [date, count]) => 
+        count > max.count ? {date, count} : max, 
+        {date: '', count: 0}
+      );
+      
+      pdf.setFont('helvetica', 'italic');
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(
+        `Analysis Period: ${totalDays} days • Average: ${avgDaily} responses/day • Peak: ${peakDay.count} responses (${new Date(peakDay.date).toLocaleDateString('en-US')})`, 
+        margin, 
+        currentY
+      );
+      currentY += 20;
+    }
+
+    // Enhanced question summaries
+    if (poll.analytics?.questionAnalytics?.length > 0) {
+      addSectionHeader('Detailed Question Analysis');
+
+      for (const question of poll.analytics.questionAnalytics) {
+        checkPageBreak(60);
+        
+        // Question header with better styling
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(13);
+        pdf.setTextColor(40, 40, 40);
+        
+        const questionText = pdf.splitTextToSize(`Q: ${question.questionText}`, pageWidth - margin * 2);
+        pdf.text(questionText, margin, currentY);
+        currentY += questionText.length * 6 + 5;
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        pdf.setTextColor(120, 120, 120);
+        pdf.text(`Type: ${question.type} • Total Responses: ${question.totalResponses}`, margin, currentY);
+        currentY += 12;
+
+        // Enhanced data visualization for different question types
+        if (question.optionCounts) {
+          const optionEntries = Object.entries(question.optionCounts);
+          const maxWidth = pageWidth - margin * 2;
+          
+          // Clean table header
+          pdf.setFillColor(245, 245, 245);
+          pdf.setDrawColor(200, 200, 200);
+          pdf.rect(margin, currentY, maxWidth, 10, 'FD');
+          
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(10);
+          pdf.setTextColor(60, 60, 60);
+          pdf.text('Response Option', margin + 3, currentY + 7);
+          pdf.text('Count (%)', margin + maxWidth * 0.7, currentY + 7);
+          currentY += 12;
+          
+          // Clean table rows
+          for (const [option, count] of optionEntries) {
+            const percentage = Math.round((count / question.totalResponses) * 100);
+            
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(10);
+            pdf.setTextColor(40, 40, 40);
+            
+            const optionText = pdf.splitTextToSize(option, maxWidth * 0.65);
+            pdf.text(optionText, margin + 3, currentY + 6);
+            
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(`${count} (${percentage}%)`, margin + maxWidth * 0.7, currentY + 6);
+            
+            // Clean progress bar
+            const barWidth = (maxWidth * 0.3) * (percentage / 100);
+            pdf.setFillColor(249, 115, 22, 0.7);
+            pdf.roundedRect(margin + maxWidth * 0.75, currentY + 2, barWidth, 5, 1, 1, 'F');
+            
+            currentY += Math.max(optionText.length * 5, 8);
+          }
+          currentY += 10;
+        } 
+        else if (question.agreementCounts) {
+          const agreePercent = Math.round((question.agreementCounts.agree / question.totalResponses) * 100);
+          const disagreePercent = Math.round((question.agreementCounts.disagree / question.totalResponses) * 100);
+          
+          // Create a clean agreement visualization
+          pdf.setFillColor(240, 253, 244);
+          pdf.setDrawColor(34, 197, 94);
+          pdf.roundedRect(margin, currentY, (pageWidth - margin * 2) / 2 - 5, 20, 2, 2, 'FD');
+          
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(11);
+          pdf.setTextColor(22, 163, 74);
+          pdf.text('AGREE', margin + 5, currentY + 8);
+          pdf.text(`${question.agreementCounts.agree} (${agreePercent}%)`, margin + 5, currentY + 15);
+          
+          pdf.setFillColor(254, 242, 242);
+          pdf.setDrawColor(239, 68, 68);
+          pdf.roundedRect(margin + (pageWidth - margin * 2) / 2 + 5, currentY, (pageWidth - margin * 2) / 2 - 5, 20, 2, 2, 'FD');
+          
+          pdf.setTextColor(220, 38, 38);
+          pdf.text('DISAGREE', margin + (pageWidth - margin * 2) / 2 + 10, currentY + 8);
+          pdf.text(`${question.agreementCounts.disagree} (${disagreePercent}%)`, margin + (pageWidth - margin * 2) / 2 + 10, currentY + 15);
+          
+          currentY += 30;
+        } 
+        else if (question.ratingStats) {
+          // Enhanced rating display
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(12);
+          pdf.setTextColor(40, 40, 40);
+          pdf.text(`Average Rating: ${question.ratingStats.average.toFixed(1)} / 5.0`, margin, currentY);
+          currentY += 10;
+          
+          // Clean rating distribution
+          for (let rating = 5; rating >= 1; rating--) {
+            const count = question.ratingStats.distribution[rating] || 0;
+            const percentage = Math.round((count / question.totalResponses) * 100);
+            
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(10);
+            pdf.setTextColor(40, 40, 40);
+            pdf.text(`${rating} Star${rating !== 1 ? 's' : ''}:`, margin, currentY);
+            pdf.text(`${count} responses (${percentage}%)`, margin + 25, currentY);
+            
+            // Clean progress bar
+            pdf.setFillColor(249, 115, 22, 0.7);
+            pdf.roundedRect(margin + 80, currentY - 3, 60 * (percentage / 100), 6, 1, 1, 'F');
+            
+            currentY += 8;
+          }
+          currentY += 10;
+        }
+        
+        // Clean section separator
+        pdf.setDrawColor(230, 230, 230);
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, currentY, pageWidth - margin, currentY);
+        currentY += 15;
+      }
+    }
+
+    // Add watermark and footer to all pages
+    const totalPages = pdf.internal.getNumberOfPages();
+    
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      if (i > 1) {
+        addDiagonalWatermark(); // Ensure all pages have watermark
+      }
+      addFooter(i, totalPages);
+    }
+    
+    // Clean filename and download
+    const cleanTitle = poll.title.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+    const fileName = `${cleanTitle}_Analytics_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+    pdf.save(fileName);
+    
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    setError('Failed to generate PDF report. Please try again.');
+  } finally {
+    setPdfLoading(false);
+  }
+};
+
+  const handleDeletePoll = async () => {
+  if (!deleteId) return;
+  
+  try {
+    console.log('Deleting poll with ID:', deleteId);
+    
+    const response = await fetch(`/api/myPolls?pollId=${deleteId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    console.log('Delete response status:', response.status);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Delete error response:', errorData);
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    console.log('Delete success:', result);
+    
+    // Check for success flag
+    if (result.success) {
       setPolls(polls.filter(poll => poll._id !== deleteId));
       setIsDeleteModalOpen(false);
       setDeleteId(null);
-      
+
       if (selectedPoll?._id === deleteId) {
         setSelectedPoll(null);
       }
-    } catch (error) {
-      console.error('Error deleting poll:', error);
-      setError('Failed to delete poll. Please try again.');
-    }
-  };
 
+      // Optional: Update organization info if needed
+      if (result.organization) {
+        setOrganization(result.organization);
+      }
+      
+      // Optional: Show success message
+      console.log('Poll deleted successfully:', result.deletedPoll?.title);
+    } else {
+      throw new Error('Delete operation failed');
+    }
+    
+  } catch (error) {
+    console.error('Error deleting poll:', error);
+    setError(`Failed to delete poll: ${error.message}`);
+    // Don't close the modal on error so user can try again
+  }
+};
   const exportToCSV = (poll: Poll) => {
     setExportLoading(true);
     
@@ -433,7 +808,7 @@ export default function PollDashboard() {
         <div>
           <h3 className="text-lg font-semibold text-white">{poll.title}</h3>
           <p className="text-gray-400 text-sm mt-1">
-            Organization: {poll.organization.name}
+            Organization: {poll.organizationInfo?.name || poll.organization?.name}
           </p>
           <div className="flex space-x-2 mt-2">
             <span className={`px-2 py-1 rounded text-xs ${poll.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300'}`}>
@@ -514,11 +889,21 @@ export default function PollDashboard() {
       </div>
       
       <div className="flex flex-wrap gap-4">
+         <button 
+            className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white py-2 px-4 rounded-lg font-medium transition-all flex items-center"
+            onClick={() => exportToPDF(poll)}
+            disabled={pdfLoading}
+            >
+          <Download size={16} className="mr-2" />
+          {pdfLoading ? 'Generating PDF...' : 'Export PDF Report'}
+        </button>
+
+        {/* Other buttons remain the same */}
         <button 
-          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white py-2 px-4 rounded-lg font-medium transition-all flex items-center"
-          onClick={() => setActiveTab('analytics')}
+        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white py-2 px-4 rounded-lg font-medium transition-all flex items-center"
+        onClick={() => setActiveTab('analytics')}
         >
-          <BarChart3 size={16} className="mr-2" />
+        <BarChart3 size={16} className="mr-2" />
           View Analytics
         </button>
         <button 
@@ -965,7 +1350,7 @@ export default function PollDashboard() {
               </h1>
             </div>
             <div className="text-gray-400 font-light">
-              <span className="text-sm">{session.user?.organization || 'My Organization'}</span>
+              <span className="text-sm">{organization?.name || 'My Organization'}</span>
             </div>
           </div>
           <div className="flex items-center">
