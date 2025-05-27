@@ -602,23 +602,23 @@ export default function PollResponsePage() {
               </span>
             </div>
             <div className="text-gray-500 text-sm mb-4">
-              Built by <span className="text-white font-medium">Devashish</span>
+              Build by <span className="text-white font-medium">Devashish</span>
             </div>
             <div className="flex items-center justify-center space-x-4">
               <a 
-                href="/" 
+                href="https://x.com/Devashish6363" 
                 className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors group"
               >
                 <Twitter size={16} className="text-gray-400 group-hover:text-blue-400" />
               </a>
               <a 
-                href="/" 
+                href="https://www.linkedin.com/in/devashish-mishra-436891254/" 
                 className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors group"
               >
                 <Linkedin size={16} className="text-gray-400 group-hover:text-blue-500" />
               </a>
               <a 
-                href="/" 
+                href="https://www.instagram.com/devashish_6363/" 
                 className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors group"
               >
                 <Instagram size={16} className="text-gray-400 group-hover:text-pink-500" />

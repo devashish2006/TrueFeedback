@@ -116,7 +116,7 @@ export async function GET(request: Request) {
       return {
         ...poll,
         slug: poll.slug,
-        url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/u/org/${organization.name}/${session.user.username}/${poll.slug}`,
+        url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.truefeedback.xyz/'}/u/org/${organization.name}/${session.user.username}/${poll.slug}`,
         status: poll.responses.length > 0 ? 'active' : 'inactive',
         responsesCount: poll.responses.length,
         createdAt: poll.createdAt,

@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     const userUsername = username; // User username from session
 
     // Construct the poll URL with the new format
-    const pollUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://trufeedback.xyz'}/u/org/${orgUsername}/${userUsername}/${slug}`;
+    const pollUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.truefeedback.xyz'}/u/org/${orgUsername}/${userUsername}/${slug}`;
 
     return NextResponse.json(
       { 
